@@ -11,7 +11,6 @@
 #import "ResultViewController.h"
 @interface ViewController : UIViewController<CallOneDelegate>
 
-@property (nonatomic,retain) IBOutlet UISwitch *demoProductionSwitch;
 @property (nonatomic,retain) IBOutlet UIButton *initialLibbtn;
 @property (nonatomic,retain) IBOutlet UIButton *salebtn;
 @property (nonatomic,retain) IBOutlet UIButton *returnbtn;
@@ -24,7 +23,6 @@
 @property (nonatomic,retain) IBOutlet UITextField *tokenField;
 @property (nonatomic,retain) IBOutlet UILabel *informationLabel;
 @property (nonatomic,retain) IBOutlet UILabel *messageLabel;
-@property (nonatomic,retain) IBOutlet UISwitch *logfileSwitch;
 @property (nonatomic,retain) IBOutlet ResultViewController *resultView;
 -(IBAction)initbtnClicked:(id)sender;
 @end

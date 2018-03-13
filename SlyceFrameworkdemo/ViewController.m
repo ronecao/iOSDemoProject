@@ -31,7 +31,6 @@
 
 @implementation ViewController
 @synthesize call1;
-@synthesize demoProductionSwitch;
 @synthesize initialLibbtn;
 @synthesize salebtn;
 @synthesize returnbtn;
@@ -47,21 +46,16 @@
 @synthesize resultView;
 @synthesize file;
 @synthesize selectedIndex;
-@synthesize logfileSwitch;
 
 #pragma mark view operations
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
 
-//set all components disabled
- //self.navigationController = [[UINavigationController alloc] init];
-    //NSLog(@"%@",[CallOne Version]);
     [self initComponents];
     self.title=@"cmsdemo";
     if(self.navigationController)
     {
-        NSLog(@"ddd");
+        NSLog(@"has navigationController");
     }
     file = [[FileControl alloc]init];
     [file deleteFile:@"Records" theFile:CCRETURN];
@@ -75,13 +69,7 @@
     [file createRecordFile:UPSALE];
     [file createRecordFile:UPRETURN];
     [file createRecordFile:UPAUTH];
-    [self processTokenfile];
-   
-    
-    //[file removedRecord:1 fromFile:UPSALE];
-    //[self showResult:@"ttt"];
-   
-    //NSLog(@"%@",res);
+
 }
 
 
@@ -90,49 +78,9 @@
     // Dispose of any resources that can be recreated.
 }
 
--(void) processTokenfile
-{
-    @try {
-        NSString * res=[file readFile:@"" atFile:@"CMSTokens.txt"];
-        NSDictionary *tokendic= [file StringToDictionary2:res];
-        NSArray *tokenarray=[tokendic objectForKey:@"CMSTokens"];
-        UIAlertController* inforAlert = [UIAlertController alertControllerWithTitle:@"CMS Token List"
-                                                                            message:@"Please Select Token" preferredStyle:UIAlertControllerStyleAlert];
 
-        for (NSDictionary *token in tokenarray)
-        {
-            
-            UIAlertAction* okAction = [UIAlertAction actionWithTitle:[token objectForKey:@"Token"] style:UIAlertActionStyleDefault
-                                                             handler:^(UIAlertAction * action) {
-                                                                 [tokenField setText:[token objectForKey:@"Token"]];
-                                                                  if ([[token objectForKey:@"Production"] isEqualToString:@"True"])
-                                                                  {
-                                                                      [demoProductionSwitch setOn:YES];
-                                                                  }
-                                                                 [self initbtnClicked:nil];}];
-            [inforAlert addAction:okAction];
-        }
-        UIAlertAction* cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleDefault
-                                                             handler:^(UIAlertAction * action) {}];
-        [inforAlert addAction:cancelAction];
-         [self presentViewController:inforAlert animated:YES completion:nil];
-        
-        
-    } @catch (NSException *exception) {
-        NSLog(@"no token");
-    }
 
-    
-    
-}
 
--(IBAction)getSwitch
-{
-    
-    [call1 setfilemode: logfileSwitch.on];
-    [call1 setLogMode:logfileSwitch.on];
-    [call1 setProduction:demoProductionSwitch.on];
-}
 -(void)connectPinPad
 {
     NSError * error;
@@ -426,6 +374,24 @@
     });
 
 }
+- (void)transactionVoidCompleted:(NSDictionary *)resultDict {
+    [call1 APPLog:@"APP void %@",resultDict];
+    if ([resultDict objectForKey:@"error"] ==nil)
+    {
+        
+        [file removedRecord:selectedIndex fromFile:UPSALE];
+        //[file addRecord:resultDict fromFile:UPSALE];
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self showResult:@"void SUCCESS"];
+        });
+    }
+    else
+    {   dispatch_async(dispatch_get_main_queue(), ^{
+        [self showResult:@"void FAILED"];
+    });
+    }
+}
 
 /**
  when pin pad is disconnected, all the function must be disabled
@@ -449,24 +415,6 @@
     [self confirmcard: card];
 }
 
-- (void)transactionVoidCompleted:(NSDictionary *)resultDict {
-    [call1 APPLog:@"APP void %@",resultDict];
-    if ([resultDict objectForKey:@"error"] ==nil)
-    {
-        
-            [file removedRecord:selectedIndex fromFile:UPSALE];
-            //[file addRecord:resultDict fromFile:UPSALE];
-        
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self showResult:@"void SUCCESS"];
-        });
-    }
-    else
-    {   dispatch_async(dispatch_get_main_queue(), ^{
-        [self showResult:@"void FAILED"];
-    });
-    }
-}
 
 
 
@@ -872,13 +820,7 @@
 {
     informationLabel.text=@"";
     [self updateInformationLabel:@"Start"];
-    //tokenField.text=@"phQP9iBIEgl4nEFi8vQmFf25q6m8PieC";//creditcall
-    //tokenField.text=@"JHjBXXjnC0FIHTTmweKrVsA797FPlJLj";//cardflight
-    //tokenField.text=@"teiU6f4zf6dBx9oGDKx4bBxOqmADhAWG";//USEAEPAY
-    //tokenField.text=@"2l588Thtu6dfFamFKg4JAYCn5XlUzqoC";//USAEPAyLive
-    tokenField.text=@"1FgJZnjTAfBVi3fWysrnPpxIdGxTfNls";//creditcall
-    //tokenField.text=@"3fyl02KZBOERy7yEd6SkWqbuYmGqHQ2T";//cardflight;
-    //tokenField.text=@"1FgJZnjTAfBVi3fWysrnPpxIdGxTfNls";//creditcall
+tokenField.text=@"1FgJZnjTAfBVi3fWysrnPpxIdGxTfNls";//creditcall
     if([tokenField.text isEqual:[NSNull null]]||tokenField.text.length==0)
     {
         [self updateInformationLabel:@"Enter CMS Token Please"];
