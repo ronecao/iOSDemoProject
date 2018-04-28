@@ -9,7 +9,6 @@
 
 #import <UIKit/UIKit.h>
 #import "CallOne.h"
-#import "CallOneTransResponse.h"
 #import "FileControl.h"
 #import "EMVIOiOSBridge.h"
 #define CALLMODULE @"Module"
@@ -69,7 +68,7 @@ typedef NS_ENUM(NSInteger, CALLERRORList) {
     CALLCurrencyNotSupportedForPaymentMethod    = 1021,    /**< (1021) Currency is not supported for payment method. */
     CALLEndOfDayTippingNotSupported             = 1022,    /**< (1022) End of Day Tipping is not supported */
     CALLOnDeviceTippingNotSupported             = 1023,    /**< (1023) On Device Tipping is not supported */
-    CALLPinPadeckRequired                       = 1024,    /**< (1024) A PIN pad check is required. */
+    CallPinpadcheckrequired                     = 1024,    /**< (1024) A PIN pad check is required. */
     CALLSREDKeyRequired                         = 1025,     /**< (1024) The SRED Key has failed to inject and is missing. */
     CALLUnableToOpenURL                         = 3001,   /**< (3001) Unable to open the specified URL. */
     CALLUnableToSpecifyCommunicationProtocol    = 3002,   /**< (3002) Unable to specify communication protocol. */

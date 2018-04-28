@@ -15,6 +15,8 @@
 		833573EA1E445E9000733966 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 833573E81E445E9000733966 /* LaunchScreen.storyboard */; };
 		833573F51E445E9000733966 /* SlyceFrameworkdemoTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 833573F41E445E9000733966 /* SlyceFrameworkdemoTests.m */; };
 		833574001E445E9000733966 /* SlyceFrameworkdemoUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 833573FF1E445E9000733966 /* SlyceFrameworkdemoUITests.m */; };
+		833CC1172094ACC0005B13FE /* CardFlight.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 833CC1162094ACC0005B13FE /* CardFlight.framework */; };
+		833CC1182094ACC0005B13FE /* CardFlight.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 833CC1162094ACC0005B13FE /* CardFlight.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		8352AD811FA1B9460054A84A /* WebViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8352AD7F1FA1B9460054A84A /* WebViewController.m */; };
 		8352AD821FA1B9460054A84A /* WebViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8352AD801FA1B9460054A84A /* WebViewController.xib */; };
 		8352AD841FA1BD6C0054A84A /* JSCallOC.html in Resources */ = {isa = PBXBuildFile; fileRef = 8352AD831FA1BD6C0054A84A /* JSCallOC.html */; };
@@ -53,6 +55,7 @@
 			files = (
 				83AEC1962057D61F0084CE80 /* Call1.framework in CopyFiles */,
 				8352AD851FA1BD840054A84A /* JSCallOC.html in CopyFiles */,
+				833CC1182094ACC0005B13FE /* CardFlight.framework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -75,6 +78,7 @@
 		833573FB1E445E9000733966 /* SlyceFrameworkdemoUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SlyceFrameworkdemoUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		833573FF1E445E9000733966 /* SlyceFrameworkdemoUITests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SlyceFrameworkdemoUITests.m; sourceTree = "<group>"; };
 		833574011E445E9000733966 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		833CC1162094ACC0005B13FE /* CardFlight.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = CardFlight.framework; sourceTree = "<group>"; };
 		8352AD7E1FA1B9460054A84A /* WebViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WebViewController.h; sourceTree = "<group>"; };
 		8352AD7F1FA1B9460054A84A /* WebViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WebViewController.m; sourceTree = "<group>"; };
 		8352AD801FA1B9460054A84A /* WebViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = WebViewController.xib; sourceTree = "<group>"; };
@@ -95,6 +99,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				833CC1172094ACC0005B13FE /* CardFlight.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -118,6 +123,7 @@
 		833573CE1E445E9000733966 = {
 			isa = PBXGroup;
 			children = (
+				833CC1162094ACC0005B13FE /* CardFlight.framework */,
 				83575D311F95976C002A1E31 /* Call1.framework */,
 				833573D91E445E9000733966 /* SlyceFrameworkdemo */,
 				833573F31E445E9000733966 /* SlyceFrameworkdemoTests */,

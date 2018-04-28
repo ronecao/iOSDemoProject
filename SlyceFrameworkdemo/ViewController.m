@@ -398,7 +398,7 @@
  */
 -(void) Pinpaddisattached
 {
-    [self disableAll];
+    NSLog(@"Pinpad Disattached");
 }
 -(void)Pinpadattached
 {
@@ -411,7 +411,7 @@
 {
     NSLog( @"LOL crad %@",cardinfo.description);
     //[call1 cardinfoConfirmed:YES];
-    NSString * card=[NSString stringWithFormat:@"%@*******%@", [cardinfo objectForKey:@"first6"], [cardinfo objectForKey:@"last4"] ];
+    NSString * card=[NSString stringWithFormat:@"%@*******%@", [cardinfo objectForKey:@"First6"], [cardinfo objectForKey:@"Last4"] ];
     [self confirmcard: card];
 }
 
@@ -820,7 +820,7 @@
 {
     informationLabel.text=@"";
     [self updateInformationLabel:@"Start"];
-tokenField.text=@"1FgJZnjTAfBVi3fWysrnPpxIdGxTfNls";//creditcall
+tokenField.text=@"3fyl02KZBOERy7yEd6SkWqbuYmGqHQ2T";//cardflight
     if([tokenField.text isEqual:[NSNull null]]||tokenField.text.length==0)
     {
         [self updateInformationLabel:@"Enter CMS Token Please"];
@@ -834,16 +834,6 @@ tokenField.text=@"1FgJZnjTAfBVi3fWysrnPpxIdGxTfNls";//creditcall
     [call1 setfilemode:NO];
     [call1 setLogMode:YES];
     [tokenField resignFirstResponder];
-    
-    //NSArray *valuearray=[[NSArray alloc] initWithObjects:@"CardFlight",@"b6c934bb9ea45e8d6f8437ba872f40e1",@"acc_d8caa1cc6d2c76d2", nil];//testing merchant stripe only
-    //NSArray *valuearray=[[NSArray alloc] initWithObjects:@"CardFlight",@"6ca7f625be6d03a5e97d9d914213c519",@"acc_fc0cfe7ab2cc7df1", nil];
-    
-    //card flight testing code
-    /*[[NSUserDefaults standardUserDefaults] setObject:@"" forKey:@"ROOT_API_URL"];//testing api
-     NSArray *keyarray= [[NSArray alloc]initWithObjects:CALLMODULE,CALLAPITOKEN,CALLACCOUNTTK, nil];
-     NSArray *valuearray=[[NSArray alloc] initWithObjects:@"CardFlight",@"b6c934bb9ea45e8d6f8437ba872f40e1",@"acc_ba9e59cba758af66", nil];//testing merchant with emv
-     NSDictionary * initDict= [[NSDictionary alloc]initWithObjects:valuearray forKeys:keyarray];
-     call1 = [[CallOne alloc] initwith:initDict andDelegate:self];*/
     NSLog(@"%@",  [[NSUserDefaults standardUserDefaults] objectForKey:@"ROOT_API_URL" ]);
     
     

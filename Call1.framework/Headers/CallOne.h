@@ -9,7 +9,6 @@
 
 #import <Foundation/Foundation.h>
 #import "Call1.h"
-#import "CallOneTransResponse.h"
 @protocol CallOneDelegate <NSObject>
 
 @required
@@ -23,12 +22,12 @@
 -(void)transactionVoidCompleted:( NSDictionary *)resultDict;
 -(void)verifySignature:(BOOL) notifyflg;
 -(void)voiceReferral:(BOOL) notifyflg withphone:(NSString *) phoneNumber;
-@optional
--(void)confirmCardinfo:(NSDictionary *)cardinfo;
--(void)Pinpaddisattached;
--(void)Pinpadattached;
 -(void)transactionMessageUpdate:(NSString *) msg;
--(void)EMVApplicationList:(NSArray *)applications;
+@optional
+-(void)confirmCardinfo:(NSDictionary *)cardinfo; //cardflight
+-(void)Pinpaddisattached; // usaepay creditcall cardflight
+-(void)Pinpadattached;//cardflight
+-(void)EMVApplicationList:(NSArray *)applications; //cardflight
 
 @end
 
