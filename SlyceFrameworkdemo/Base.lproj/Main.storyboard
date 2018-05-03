@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13771" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="hpJ-e8-Ppc">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14109" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="hpJ-e8-Ppc">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13772"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14088"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -48,7 +48,7 @@
                                 </connections>
                             </textField>
                             <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" enabled="NO" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Amount" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="aWF-oX-TT8">
-                                <rect key="frame" x="153" y="213" width="154" height="30"/>
+                                <rect key="frame" x="150" y="194" width="154" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <nil key="textColor"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
@@ -58,14 +58,14 @@
                                 </connections>
                             </textField>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Amount" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="GXa-FE-Jp6">
-                                <rect key="frame" x="68" y="218" width="60" height="21"/>
+                                <rect key="frame" x="65" y="199" width="60" height="21"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="As1-4J-BtD">
-                                <rect key="frame" x="49" y="278" width="30" height="30"/>
+                                <rect key="frame" x="46" y="234" width="30" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <state key="normal" title="Sale"/>
                                 <connections>
@@ -73,7 +73,7 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="63U-m3-xlS">
-                                <rect key="frame" x="87" y="278" width="32" height="30"/>
+                                <rect key="frame" x="84" y="234" width="32" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <state key="normal" title="Auth"/>
                                 <connections>
@@ -81,45 +81,38 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="UdI-dM-zzK">
-                                <rect key="frame" x="242" y="278" width="46" height="30"/>
+                                <rect key="frame" x="239" y="234" width="46" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <state key="normal" title="Return"/>
                                 <connections>
                                     <action selector="rtnBtnClicked:" destination="BYZ-38-t0r" eventType="touchUpInside" id="n9H-eE-xJH"/>
                                 </connections>
                             </button>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="" lineBreakMode="tailTruncation" numberOfLines="11" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zI9-9v-3NH">
-                                <rect key="frame" x="74" y="352" width="239" height="109"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <nil key="textColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Information" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="WQR-mM-CCt">
-                                <rect key="frame" x="143" y="323" width="88" height="21"/>
+                                <rect key="frame" x="142" y="272" width="88" height="21"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="usy-Th-9dY">
-                                <rect key="frame" x="229" y="130" width="110" height="30"/>
+                                <rect key="frame" x="236" y="130" width="123" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <state key="normal" title="Connect Pinpad"/>
+                                <state key="normal" title="3 Connect Pinpad"/>
                                 <connections>
                                     <action selector="connectPinpadClicked:" destination="BYZ-38-t0r" eventType="touchUpInside" id="DEV-dU-ise"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Yo7-pH-rjm">
-                                <rect key="frame" x="121" y="130" width="95" height="30"/>
+                                <rect key="frame" x="122" y="130" width="108" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <state key="normal" title="Select Pinpad"/>
+                                <state key="normal" title="2 Select Pinpad"/>
                                 <connections>
                                     <action selector="selectPinPadClicked:" destination="BYZ-38-t0r" eventType="touchUpInside" id="gbJ-lK-8Di"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="SQT-ef-uJj">
-                                <rect key="frame" x="180" y="278" width="55" height="30"/>
+                                <rect key="frame" x="177" y="234" width="55" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <state key="normal" title="Capture"/>
                                 <connections>
@@ -127,7 +120,7 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hq5-nm-crY">
-                                <rect key="frame" x="125" y="278" width="48" height="30"/>
+                                <rect key="frame" x="122" y="234" width="48" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <state key="normal" title="Cancel"/>
                                 <connections>
@@ -135,16 +128,16 @@
                                 </connections>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="" lineBreakMode="tailTruncation" numberOfLines="19" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZdW-af-xKt">
-                                <rect key="frame" x="76" y="454" width="227" height="121"/>
+                                <rect key="frame" x="36" y="301" width="303" height="346"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" style="UICTFontTextStyleHeadline"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="UHe-mK-3Sc">
-                                <rect key="frame" x="29" y="130" width="69" height="30"/>
+                                <rect key="frame" x="35" y="130" width="80" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <state key="normal" title="InitLibrary"/>
+                                <state key="normal" title="1 InitLibrary"/>
                                 <connections>
                                     <action selector="initbtnClicked:" destination="BYZ-38-t0r" eventType="touchUpInside" id="x79-FF-sIP"/>
                                 </connections>
@@ -157,16 +150,8 @@
                                     <action selector="clearlogs:" destination="BYZ-38-t0r" eventType="touchUpInside" id="YFV-xw-i1S"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="tlS-Ww-udz">
-                                <rect key="frame" x="121" y="156" width="64" height="30"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <state key="normal" title="WebView"/>
-                                <connections>
-                                    <action selector="toWebView:" destination="BYZ-38-t0r" eventType="touchUpInside" id="uEx-He-NDo"/>
-                                </connections>
-                            </button>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="NLF-ek-3Wa">
-                                <rect key="frame" x="301" y="278" width="31" height="30"/>
+                                <rect key="frame" x="298" y="234" width="31" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <state key="normal" title="Void"/>
                                 <connections>
@@ -183,18 +168,18 @@
                         <outlet property="cancelBtn" destination="hq5-nm-crY" id="mzr-lp-IdD"/>
                         <outlet property="capBtn" destination="SQT-ef-uJj" id="hpp-sJ-KEu"/>
                         <outlet property="connetPinBtn" destination="usy-Th-9dY" id="kWp-Xv-VA7"/>
-                        <outlet property="informationLabel" destination="zI9-9v-3NH" id="ZyM-ih-MVD"/>
                         <outlet property="initialLibbtn" destination="UHe-mK-3Sc" id="YLQ-Hs-IFi"/>
                         <outlet property="messageLabel" destination="ZdW-af-xKt" id="Q9S-Z7-Fsm"/>
                         <outlet property="returnbtn" destination="UdI-dM-zzK" id="VUn-b0-8Up"/>
                         <outlet property="salebtn" destination="As1-4J-BtD" id="0K1-gd-NdY"/>
                         <outlet property="selectPinPadBtn" destination="Yo7-pH-rjm" id="Umf-OQ-ATU"/>
                         <outlet property="tokenField" destination="PGx-ip-VHI" id="fm4-SS-wKK"/>
+                        <outlet property="voidBtn" destination="NLF-ek-3Wa" id="ZJH-nb-2cv"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="161" y="32"/>
+            <point key="canvasLocation" x="160.80000000000001" y="31.934032983508249"/>
         </scene>
     </scenes>
 </document>

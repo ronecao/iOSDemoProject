@@ -27,6 +27,7 @@
 @property (nonatomic,retain) NSArray * PinPads;
 @property (nonatomic,retain)FileControl * file;
 @property NSInteger selectedIndex;
+@property (nonatomic,retain) IBOutlet UIButton * voidBtn;
 @end
 
 @implementation ViewController
@@ -35,7 +36,6 @@
 @synthesize salebtn;
 @synthesize returnbtn;
 @synthesize amountField;
-@synthesize informationLabel;
 @synthesize tokenField;
 @synthesize connetPinBtn;
 @synthesize selectPinPadBtn;
@@ -46,30 +46,14 @@
 @synthesize resultView;
 @synthesize file;
 @synthesize selectedIndex;
+@synthesize voidBtn;
 
 #pragma mark view operations
 - (void)viewDidLoad {
     [super viewDidLoad];
-
     [self initComponents];
-    self.title=@"cmsdemo";
-    if(self.navigationController)
-    {
-        NSLog(@"has navigationController");
-    }
-    file = [[FileControl alloc]init];
-    [file deleteFile:@"Records" theFile:CCRETURN];
-    [file deleteFile:@"Records" theFile:CFRETURN];
-    [file createRecordFile:CCSALE];
-    [file createRecordFile:CCRETURN];
-    [file createRecordFile:CFSALE];
-    [file createRecordFile:CFRETURN];
-    [file createRecordFile:CFAUTH];
-    [file createRecordFile:CFCAPTURE];
-    [file createRecordFile:UPSALE];
-    [file createRecordFile:UPRETURN];
-    [file createRecordFile:UPAUTH];
-
+    self.title = @"CMS Demo C";
+    [self initFiles];
 }
 
 
@@ -79,35 +63,14 @@
 }
 
 
-
-
--(void)connectPinPad
-{
-    NSError * error;
-
-    [call1 connectPinPad:&error];
-    if (error)
-    {
-        if(error.code ==CALLTMSUpdateRequired)
-        {
-           [ call1 APPLog:@" connectPinPad %lld",(long long)error.code ];
-            dispatch_async(dispatch_get_main_queue(), ^{
-            [self updateInformationLabel:[NSString stringWithFormat:@" connectPinPad %lld",(long long)error.code]];
-            [self updateInformationLabel:@"Trying TMS update"];});
-            [call1 TMSupdate:&error];
-            [call1 APPLog:@"TMSupdate  error %lld",(long long)error.code];
-        }
-        else
-        {
-            [self ErrorAlert:error.description];
-        }
-    }
-}
-
 #pragma mark delgates functions
--(void)initialisCompleted:(BOOL)ready withError:(NSError*)error
-{
-    
+
+/**
+ get init result, if error is not nil, then display error
+ @param ready indicate the init result
+ @param error indicate the errors
+ */
+-(void)initialisCompleted:(BOOL)ready withError:(NSError*)error {
     NSLog(@"APP Completed %@",error.description);
     dispatch_async(dispatch_get_main_queue(), ^{
         if (error.code != 0)//if error is rather than 0 then the init if failed
@@ -126,23 +89,27 @@
     
 }
 
--(void)TMSupdateComplete:(NSError*)error
-{
+/**
+ Triggered when TMS update is finished, and notify the result
+
+ @param error error messages
+ */
+-(void)TMSupdateComplete:(NSError*)error {
     [call1 APPLog:@"TMSupdateComplete Completed"];
     [self updateInformationLabel:@"TMS update Completed"];
-    if(error)
-    {
+    // if error show error
+    if(error){
         dispatch_async(dispatch_get_main_queue(), ^{
         [self updateInformationLabel:[NSString stringWithFormat:@"Error %lld",(long long)error.code]];
         });
         [call1 APPLog:@" TMSupdateComplete %lld",(long long)error.code];
         return;
     }
+    // no error procedure the connect pinpad
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self updateInformationLabel:@"Try Connect Pin Pad"];});
+    [self updateInformationLabel:@"Try Connect Pin Pad"];});
     [call1 connectPinPad:&error];
-    if(error)
-    {
+    if(error) {
         dispatch_async(dispatch_get_main_queue(), ^{
         [self updateInformationLabel:[NSString stringWithFormat:@" connectPinPad2 %lld",(long long)error.code]];
         });
@@ -150,11 +117,15 @@
     }
 
 }
+
+/**
+ Triggered when pinpad connectiong is finished
+
+ @param error pinpad connection errors, if no error it is nil
+ */
 -(void)PinpadconnectionComplete:(NSError*)error
 {
-     //[self updateInformationLabel:@"PinpadconnectionComplete"];//if error is null, application is ready for the transactions
-    if(error)
-    {
+    if(error) {
         dispatch_async(dispatch_get_main_queue(), ^{
         [self updateInformationLabel:[NSString stringWithFormat:@" PinpadconnectionComplete %lld",(long long)error.code]];
         });
@@ -167,49 +138,57 @@
 
 }
 
--(void)transAuthorizationCompleted:( NSDictionary *)resultDict
-{
-    //transaction complete
+/**
+ Transaction authorization is finished
 
-[call1 APPLog:@"%@",resultDict.description];
-    if([resultDict objectForKey:@"error"] ==nil)
-    {
-        resultView=[[ResultViewController alloc]init];
-        resultView.result=@"APPROVED";
-        NSString *cardinfostr =[resultDict objectForKey:@"Cardinfo"];
-        NSDictionary *carddict=[self dictionaryWithJsonString:cardinfostr];
+ @param resultDict result Dictionary of result
+ */
+-(void)transAuthorizationCompleted:(NSDictionary *)resultDict
+{
+    [call1 APPLog:@"%@",resultDict.description];
+    // if no error store the transaction and show it
+    if([resultDict objectForKey:@"error"] == nil) {
+        resultView = [[ResultViewController alloc]init];
+        resultView.result = @"APPROVED";
+        NSString *cardinfostr = [resultDict objectForKey:@"Cardinfo"];
+        NSDictionary *carddict = [self dictionaryWithJsonString:cardinfostr];
         
-        resultView.card=[NSString stringWithFormat:@"**************%@",[carddict objectForKey:@"Last4"]];
-        resultView.reference=[resultDict objectForKey:@"AuthCode"];
-        resultView.amount=[NSString stringWithFormat:@"%@", [resultDict objectForKey:@"Amount"] ];
+        resultView.card = [NSString stringWithFormat:@"**************%@",[carddict objectForKey:@"Last4"]];
+        resultView.reference = [resultDict objectForKey:@"Reference"];
+        NSString * amountv = [NSString stringWithFormat:@"%@", [resultDict objectForKey:@"AuthorizedAmount"]];
+        NSString * amountstr = [[NSString alloc]init];
+        amountstr = [self formatAmountStr:amountstr withInput:amountv];
+        resultView.amount = amountstr;
         dispatch_async(dispatch_get_main_queue(), ^{
-            [self.navigationController pushViewController:resultView animated:YES];
-            if([call1.currentModule isEqualToString:@"CALLAudio"])
-            {
-                 [file addRecord:resultDict fromFile:CFAUTH];
+            [self.navigationController pushViewController:self -> resultView animated:YES];
+            if([self -> call1.currentModule isEqualToString:@"B200"]) {
+                [self -> file addRecord:resultDict fromFile:CFAUTH];
             }
-            else
-            {
-                 [file addRecord:resultDict fromFile:UPAUTH];
+            else {
+                 [self->file addRecord:resultDict fromFile:UPAUTH];
             }
            
         });
     }
-    else
-    {
-        resultView=[[ResultViewController alloc]init];
-        resultView.result=@"Decliend";
+    else {
+        // display Declined message
+        resultView = [[ResultViewController alloc]init];
+        resultView.result = @"Decliend";
         dispatch_async(dispatch_get_main_queue(), ^{
-        [self.navigationController pushViewController:resultView animated:YES];
+        [self.navigationController pushViewController:self->resultView animated:YES];
         });
     }
 
     
     
 }
+/**
+ Transaction Sale is finished
+ 
+ @param resultDict result Dictionary of result
+ */
 -(void)transactionSaleCompleted:( NSDictionary *)resultDict
 {
-    //transaction complete
     [call1 APPLog:@"APP sale completed %@",resultDict.description];
     @try {
         NSString *jsonString = [file dictionaryToString:resultDict];
@@ -217,30 +196,32 @@
     } @catch (NSException *exception) {
           [call1 APPLog:@"APP sale exception %@",exception.description];
     }
+    // if no error show approved and store the transaction
     if([resultDict objectForKey:@"error"] ==nil)
     {
-    resultView=[[ResultViewController alloc]init];
-    resultView.result=@"APPROVED";
-        if([resultDict objectForKey:@"Cardinfo"]!=nil)
-        {
-            NSString *cardinfostr =[resultDict objectForKey:@"Cardinfo"];
-            NSDictionary *carddict=[self dictionaryWithJsonString:cardinfostr];
-            resultView.card=[NSString stringWithFormat:@"**********%@",[carddict objectForKey:@"Last4"]];
+        resultView = [[ResultViewController alloc]init];
+        resultView.result = @"APPROVED";
+        if([resultDict objectForKey:@"Cardinfo"]!=nil) {
+            NSString *cardinfostr = [resultDict objectForKey:@"Cardinfo"];
+            NSDictionary *carddict = [self dictionaryWithJsonString:cardinfostr];
+            resultView.card = [NSString stringWithFormat:@"**********%@",[carddict objectForKey:@"Last4"]];
         }
-        else
-        {
-            resultView.card= [resultDict objectForKey:@"MaskPan"];
+        else {
+            resultView.card = [resultDict objectForKey:@"MaskPan"];
         }
-    resultView.reference=[resultDict objectForKey:@"AuthCode"];
-    resultView.amount=[NSString stringWithFormat:@"%@", [resultDict objectForKey:@"Amount"] ];
+        resultView.reference = [resultDict objectForKey:@"Reference"];
+        NSString * amountv = [NSString stringWithFormat:@"%@", [resultDict objectForKey:@"AuthorizedAmount"]];
+        NSString * amountstr = [[NSString alloc]init];
+        amountstr = [self formatAmountStr:amountstr withInput:amountv];
+        resultView.amount = amountstr;
         dispatch_async(dispatch_get_main_queue(), ^{
-                [self.navigationController pushViewController:resultView animated:YES];
+                [self.navigationController pushViewController:self->resultView animated:YES];
         });
         if([[resultDict objectForKey:@"Module"] isEqualToString:@"M-10"])
         {
             [file addRecord:resultDict fromFile:CCSALE];
         }
-        else if([[resultDict objectForKey:@"Module"] isEqualToString:@"CALLAudio"])
+        else if([[resultDict objectForKey:@"Module"] isEqualToString:@"B200"])
         {
              [file addRecord:resultDict fromFile:CFSALE];
         }else if([[resultDict objectForKey:@"Module"] isEqualToString:@"MP200"])
@@ -250,31 +231,34 @@
         
         
     }
-    else
-    {
-         resultView=[[ResultViewController alloc]init];
-        resultView.result=@"Decliend";
+    else{ // show Declined
+        resultView=[[ResultViewController alloc]init];
+        resultView.result=@"Declined";
         dispatch_async(dispatch_get_main_queue(), ^{
-            [self.navigationController pushViewController:resultView animated:YES];
+            [self.navigationController pushViewController:self->resultView animated:YES];
         });
     }
 }
 
+/**
+ library request signature verification
+
+ @param notifyflg YES need notify library, NO no need notify library
+ */
 -(void)verifySignature:(BOOL) notifyflg
 {
     UIAlertController* inforAlert = [UIAlertController alertControllerWithTitle:@"Processing Sale"
                                                                         message:@"Please Verify Signature" preferredStyle:UIAlertControllerStyleAlert];
-    
     UIAlertAction* okAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault
                                                      handler:^(UIAlertAction * action) {
-                                                         [call1 signatureVerified:YES];
+                                                         [self->call1 signatureVerified:YES];
 
                                                          
                                                      }];
     UIAlertAction* cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleDefault
                                                          handler:^(UIAlertAction * action) {
                                                              
-                                                             [call1 signatureVerified:NO];
+                                                             [self->call1 signatureVerified:NO];
 
                                                              
                                                          }];
@@ -285,26 +269,31 @@
     });
   
 }
+
+/**
+ Return transaction is completed
+
+ @param resultDict transaction result
+ */
 -(void)transactionReturnCompleted:(NSDictionary *)resultDict
 {
  [call1 APPLog:@"return APP %@",resultDict];
     [call1 APPLog:@"%@",[resultDict objectForKey:@"Transtype"]];
-
     dispatch_async(dispatch_get_main_queue(), ^{
-        if ([resultDict objectForKey:@"error"] ==nil)
+        if ([resultDict objectForKey:@"Error"] ==nil)
         {
-            if([call1.currentModule isEqualToString:@"CALLAudio"])
+            if([self->call1.currentModule isEqualToString:@"B200"])
             {
-                [file removedRecord:selectedIndex fromFile:CFSALE];
-                [file addRecord:resultDict fromFile:CFRETURN];
-            }else if([call1.currentModule isEqualToString:@"MP200"])
+                [self->file removedRecord:self->selectedIndex fromFile:CFSALE];
+                [self->file addRecord:resultDict fromFile:CFRETURN];
+            }else if([self->call1.currentModule isEqualToString:@"MP200"])
             {
-                [file removedRecord:selectedIndex fromFile:UPSALE];
-                [file addRecord:resultDict fromFile:UPRETURN];
+                [self->file removedRecord:self->selectedIndex fromFile:UPSALE];
+                [self->file addRecord:resultDict fromFile:UPRETURN];
             }else
             {
-                [file removedRecord:selectedIndex fromFile:CCSALE];
-                [file addRecord:resultDict fromFile:CCRETURN];
+                [self->file removedRecord:self->selectedIndex fromFile:CCSALE];
+                [self->file addRecord:resultDict fromFile:CCRETURN];
             }
             [self showResult:@"Return SUCCESS"];
         }
@@ -316,10 +305,16 @@
     });
     
 }
+
+/**
+ Transaction Capture is finished
+
+ @param resultDict capture transaction result
+ */
 -(void)transactionCaptureCompleted:(NSDictionary *)resultDict
 {
    [call1 APPLog:@"APP capture %@",resultDict];
-    if ([resultDict objectForKey:@"error"] ==nil)
+    if ([resultDict objectForKey:@"error"] == nil)
     {
         if([call1.currentModule isEqualToString:@"CALLAudio"])
         {
@@ -345,6 +340,13 @@
 {
    messageLabel.text= [NSString stringWithFormat:@"%@\r%@",messageLabel.text,msg];
 }
+
+/**
+ voice Referral is requesting operator call the bank and get the authcode
+
+ @param notifyflg YES notify library NO no need notify library
+ @param phoneNumber Number of call the bank
+ */
 -(void) voiceReferral:(BOOL)notifyflg withphone:(NSString *)phoneNumber
 {
     NSString *msgTitle=[NSString stringWithFormat:@"Please Call %@",phoneNumber];
@@ -355,42 +357,23 @@
     UIAlertAction* okAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault
                                                      handler:^(UIAlertAction * action) {
                                                          UITextField *infoTextfield= inforAlert.textFields.firstObject;
-                                                             [call1 phoneReferral:YES withAuthcode:infoTextfield.text];
+                                                             [self->call1 phoneReferral:YES withAuthcode:infoTextfield.text];
                                                          
                                                      }];
     UIAlertAction* cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleDefault
                                                      handler:^(UIAlertAction * action) {
                                                          
-                                                         [call1 phoneReferral:NO withAuthcode:@""];
+                                                         [self->call1 phoneReferral:NO withAuthcode:@""];
                                                          
                                                      }];
 
     [inforAlert addTextFieldWithConfigurationHandler:^(UITextField* textfield){}];
     [inforAlert addAction:okAction];
     [inforAlert addAction:cancelAction];
-    
     dispatch_async(dispatch_get_main_queue(), ^{
         [self presentViewController:inforAlert animated:YES completion:nil];
     });
 
-}
-- (void)transactionVoidCompleted:(NSDictionary *)resultDict {
-    [call1 APPLog:@"APP void %@",resultDict];
-    if ([resultDict objectForKey:@"error"] ==nil)
-    {
-        
-        [file removedRecord:selectedIndex fromFile:UPSALE];
-        //[file addRecord:resultDict fromFile:UPSALE];
-        
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self showResult:@"void SUCCESS"];
-        });
-    }
-    else
-    {   dispatch_async(dispatch_get_main_queue(), ^{
-        [self showResult:@"void FAILED"];
-    });
-    }
 }
 
 /**
@@ -398,8 +381,12 @@
  */
 -(void) Pinpaddisattached
 {
-    NSLog(@"Pinpad Disattached");
+    [call1 APPLog:@" pinpad disattached"];
 }
+
+/**
+ when pinpad is disconnected, it will pop up
+ */
 -(void)Pinpadattached
 {
     [call1 APPLog:@" pinpad attached"];
@@ -415,29 +402,53 @@
     [self confirmcard: card];
 }
 
+- (void)transactionVoidCompleted:(NSDictionary *)resultDict {
+    [call1 APPLog:@"APP void %@",resultDict];
+    if ([resultDict objectForKey:@"error"] ==nil)
+    {
+        
+            [file removedRecord:selectedIndex fromFile:UPSALE];
+            //[file addRecord:resultDict fromFile:UPSALE];
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self showResult:@"void SUCCESS"];
+        });
+    }
+    else
+    {   dispatch_async(dispatch_get_main_queue(), ^{
+        [self showResult:@"void FAILED"];
+    });
+    }
+}
 
 
 
 #pragma mark textField delgate
+
+/**
+ hide keyboard
+
+ @param textField the object texfield
+ @return return YES to hide keyboard
+ */
 - (BOOL)textFieldShouldReturn:(UITextField *)textField
 {
     [textField resignFirstResponder];
     return YES;
 }
-
-- (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string
-{
-    NSString * temper=textField.text;
+/**
+    format the input
+ */
+- (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string{
+    NSString * temper = textField.text;
     
-    if ([string isEqualToString:@""])//enable remove
-    {
+    if ([string isEqualToString:@""]){
         return YES;
     }
-    temper=[self formatAmountStr:temper withInput:string];//processing ammount input
-    textField.text=temper;
+    temper = [self formatAmountStr:temper withInput:string];//processing ammount input
+    textField.text = temper;
     return NO;
 }
-
 
 - (void)textFieldDidEndEditing:(UITextField *)textField
 {
@@ -445,13 +456,16 @@
 }
 #pragma mark View operations
 
--(void)updateInformationLabel:(NSString *) content
-{
-    informationLabel.text= [NSString stringWithFormat:@"%@\r%@",informationLabel.text,content];
+/**
+ upldate message on the label
+
+ @param content display messages
+ */
+-(void)updateInformationLabel:(NSString *) content {
+    messageLabel.text= [NSString stringWithFormat:@"%@\r%@",messageLabel.text,content];
 }
 
--(void) initComponents
-{
+-(void) initComponents {
     [amountField setEnabled:NO];
     [selectPinPadBtn setEnabled:NO];
     [connetPinBtn setEnabled:NO];
@@ -460,6 +474,7 @@
     [cancelBtn setEnabled:NO];
     [authBtn setEnabled:NO];
     [capBtn setEnabled:NO];
+    [voidBtn setEnabled:NO];
     [amountField setDelegate:self];
 }
 
@@ -476,6 +491,7 @@
     [cancelBtn setEnabled:YES];
     [authBtn setEnabled:YES];
     [capBtn setEnabled:YES];
+    [voidBtn setEnabled:YES];
 }
 -(void) disableAll
 {
@@ -487,99 +503,98 @@
     [cancelBtn setEnabled:NO];
     [authBtn setEnabled:NO];
     [capBtn setEnabled:NO];
+    [voidBtn setEnabled:NO];
 }
 
 
 #pragma mark Btn functions
 
+/**
+ Cancel the transaction, not working for all modules
+
+ @param sender events
+ */
 -(IBAction)cnlBtnClicked:(id)sender
 {
-    
     [call1 terminateTransaction];
-    
 }
--(IBAction)voidBtnClicked:(id)sender
-{
-    
+/**
+ Void the transaction, get the trans file first, then build the transaction menu.
+ after user select the transaction, process the void operation
+ @param sender events
+ */
+-(IBAction)voidBtnClicked:(id)sender {
     NSString * filestr;
-    if([call1.currentModule isEqualToString:@"MP200"])
-    {
-        filestr=[file readFile:@"Records" atFile:UPSALE];
+    // get the transaction file name
+    if([call1.currentModule isEqualToString:@"MP200"]){
+        filestr = [file readFile:@"Records" atFile:UPSALE];
     }else if([call1.currentModule isEqualToString:@"Miura 125"]){
-         filestr=[file readFile:@"Records" atFile:CCSALE];
+        filestr = [file readFile:@"Records" atFile:CCSALE];
+    }else if([call1.currentModule isEqualToString:@"B200"]){
+        filestr = [file readFile:@"Records" atFile:CFSALE];
     }
-    else
-    {
+    else {
         return;
     }
-    if([filestr isEqual:[NSNull null]]||filestr==nil)
-    {
+    if([filestr isEqual:[NSNull null]] || filestr == nil){
         return;
     }
-    
-    NSDictionary *filedic= [file StringToDictionary:filestr];
-    NSArray *recordsArray= [filedic objectForKey:@"data"];
+    NSDictionary *filedic = [file StringToDictionary:filestr];
+    NSArray *recordsArray = [filedic objectForKey:@"data"];
     UIAlertController* inforAlert = [UIAlertController alertControllerWithTitle:@"Processing void" message:@"please select Transaction"   preferredStyle:UIAlertControllerStyleAlert];
-    NSInteger counter=0;
+    NSInteger counter = 0;
+    // build the list of transactions
     for (NSDictionary *res in recordsArray)
     {
-        
         NSString * cardinfostr = [res objectForKey:@"Cardinfo"];
-        if(cardinfostr==nil)
-        {
+        if(cardinfostr==nil){
             return;
         }
         NSDictionary * cardinfo = [file StringToDictionary:cardinfostr];
-        NSString * title=[NSString stringWithFormat:@"%@*******%@,%@,%@",[cardinfo objectForKey:@"First6"],[cardinfo objectForKey:@"Last4"], [res objectForKey:@"AuthCode"],[res objectForKey:@"AuthorizedAmount"]];
+        NSString * title = [NSString stringWithFormat:@"%@*******%@,%@,%@",[cardinfo objectForKey:@"First6"],[cardinfo objectForKey:@"Last4"], [res objectForKey:@"Reference"],[res objectForKey:@"AuthorizedAmount"]];
         UIAlertAction* okAction = [UIAlertAction actionWithTitle:title style:UIAlertActionStyleDefault
                                                          handler:^(UIAlertAction * action) {
-                                                             //result=@"ok"
                                                              NSError *error;
-                                                             
-                                                             selectedIndex = counter;
+                                                             self->selectedIndex = counter;
+                                                             //build paymentinfo dict for the transaction
                                                              NSDictionary *paymentInfo= [self buildDictforrtn:[res objectForKey:@"Reference"] withCurrency:@"USD" andAmount:[res objectForKey:@"AuthorizedAmount"] cardinfo:cardinfostr];
-                                                             [call1 processVoid:paymentInfo withError:&error];
-                                                             messageLabel.text=@" ";
-                                                             [call1 APPLog:@"return is selected %@",paymentInfo.description ];
-                                                             if (error)
-                                                             {
-                                                                 NSString * msg= [NSString stringWithFormat:@"return error %@",error.description];
+                                                             [self->call1 processVoid:paymentInfo withError:&error];
+                                                             self->messageLabel.text = @"Processing Void";
+                                                             [self->call1 APPLog:@"return is selected %@",paymentInfo.description ];
+                                                             if (error) {
+                                                                 NSString * msg = [NSString stringWithFormat:@"return error %@",error.description];
                                                                  [self showResult:msg];
                                                              }
                                                              
                                                          }];
         [inforAlert addAction:okAction];
         counter ++;
-        
-        
     }
-    
-    
     UIAlertAction* cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleDefault
                                                          handler:^(UIAlertAction * action) {
                                                              
                                                              //result=@"cancel"
                                                              
                                                          }];
-    
     [inforAlert addAction:cancelAction];
-    
+    // show the menual
     [self presentViewController:inforAlert animated:YES completion:nil];
-    
-    
 }
+/**
+ return the transaction, get the trans file first, then build the transaction list.
+ after user select the transaction, process the void operation
+ @param sender events
+ */
 -(IBAction)rtnBtnClicked:(id)sender
 {
+    // get the transaction file name
     NSString * filestr;
-    if([call1.currentModule isEqualToString:@"CALLAudio"])
-    {
+    if([call1.currentModule isEqualToString:@"B200"]){
         filestr = [file readFile:@"Records" atFile:CFSALE];
-    }else if([call1.currentModule isEqualToString:@"Miura 125"])
-    {
-        filestr= [file readFile:@"Records" atFile:CCSALE];
-    }else if([call1.currentModule isEqualToString:@"MP200"])
-    {
-        filestr=[file readFile:@"Records" atFile:UPSALE];
+    }else if([call1.currentModule isEqualToString:@"Miura 125"]) {
+        filestr = [file readFile:@"Records" atFile:CCSALE];
+    }else if([call1.currentModule isEqualToString:@"MP200"]) {
+        filestr =[file readFile:@"Records" atFile:UPSALE];
     }
     else{
         return;
@@ -588,31 +603,82 @@
     {
         return;
     }
-    
-    NSDictionary *filedic= [file StringToDictionary:filestr];
-    NSArray *recordsArray= [filedic objectForKey:@"data"];
+    NSDictionary *filedic = [file StringToDictionary:filestr];
+    NSArray *recordsArray = [filedic objectForKey:@"data"];
     UIAlertController* inforAlert = [UIAlertController alertControllerWithTitle:@"Processing Return" message:@"please select Transaction"   preferredStyle:UIAlertControllerStyleAlert];
     NSInteger counter=0;
+    // build the list of transactions
     for (NSDictionary *res in recordsArray)
     {
-        
         NSString * cardinfostr = [res objectForKey:@"Cardinfo"];
         NSDictionary * cardinfo = [file StringToDictionary:cardinfostr];
-        NSString * title=[NSString stringWithFormat:@"%@*******%@,%@,%@",[cardinfo objectForKey:@"First6"],[cardinfo objectForKey:@"Last4"], [res objectForKey:@"AuthCode"],[res objectForKey:@"AuthorizedAmount"]];
+        NSString * title=[NSString stringWithFormat:@"%@*******%@,%@,%@",[cardinfo objectForKey:@"First6"],[cardinfo objectForKey:@"Last4"], [res objectForKey:@"Reference"],[res objectForKey:@"AuthorizedAmount"]];
         UIAlertAction* okAction = [UIAlertAction actionWithTitle:title style:UIAlertActionStyleDefault
                                                          handler:^(UIAlertAction * action) {
-                                                             //result=@"ok"
                                                              NSError *error;
-                                                             
-                                                             selectedIndex = counter;
+                                                             self->selectedIndex = counter;
+                                                             //build request for return transaction
                                                              NSDictionary *paymentInfo= [self buildDictforrtn:[res objectForKey:@"Reference"] withCurrency:@"USD" andAmount:[res objectForKey:@"AuthorizedAmount"] cardinfo:cardinfostr];
-                                                             [call1 processReturn:paymentInfo withError:&error];
-                                                             messageLabel.text=@" ";
-                                                             [call1 APPLog:@"return is selected %@",paymentInfo.description ];
+                                                             [self->call1 processReturn:paymentInfo withError:&error];
+                                                             self->messageLabel.text=@"Processing Return";
+                                                             [self->call1 APPLog:@"return is selected %@",paymentInfo.description ];
                                                              if (error)
                                                              {
                                                                  NSString * msg= [NSString stringWithFormat:@"return error %@",error.description];
                                                                  [self showResult:msg];
+                                                             }
+                                                             
+                                            }];
+        [inforAlert addAction:okAction];
+        counter ++;
+        
+    }
+    UIAlertAction* cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleDefault
+                                                         handler:^(UIAlertAction * action) {
+                                                         }];
+    [inforAlert addAction:cancelAction];
+    [self presentViewController:inforAlert animated:YES completion:nil];
+}
+/**
+ Capture the Authorization transaction, get the trans file first, then build the transaction list.
+ after user select the transaction, process the void operation
+ @param sender events
+ */
+-(IBAction)capBtnClicked:(id)sender {
+    if([amountField.text isEqualToString:@"0.00"]||amountField.text.length==0)
+    {
+        [self ErrorAlert:@"Enter Amount First"];
+        return;
+    }
+    // get the transaction file name
+    NSString * filestr;
+    if([call1.currentModule isEqualToString:@"B200"]) {
+        filestr = [file readFile:@"Records" atFile:CFAUTH];
+    }else if([call1.currentModule isEqualToString:@"MP200"])
+    {
+        filestr = [file readFile:@"Records" atFile:UPAUTH];
+    }
+    NSDictionary *filedic= [file StringToDictionary:filestr];
+    NSArray *recordsArray= [filedic objectForKey:@"data"];
+    UIAlertController* inforAlert = [UIAlertController alertControllerWithTitle:@"Processing Capture" message:@"please select Transaction"   preferredStyle:UIAlertControllerStyleAlert];
+    NSInteger counter=0;
+        // build the list of transactions
+    for (NSDictionary *res in recordsArray)
+    {
+        NSString *cardinfostr= [res objectForKey:@"Cardinfo"];
+        NSLog(@"%@",cardinfostr);
+        NSDictionary * cardinfo = [file StringToDictionary:cardinfostr];
+        NSString * title=[NSString stringWithFormat:@"%@*******%@,%@",[cardinfo objectForKey:@"First6"],[cardinfo objectForKey:@"Last4"], [res objectForKey:@"Reference"]];
+        UIAlertAction* okAction = [UIAlertAction actionWithTitle:title style:UIAlertActionStyleDefault
+                                                         handler:^(UIAlertAction * action) {
+                                                             NSError *error;
+                                                             self->selectedIndex = counter;
+                                                             NSDictionary *paymentInfo = [self buildDictforcap:[res objectForKey:@"Reference"] withAmount:self->amountField.text andCardinfo:cardinfo];
+                                                             [self->call1 processCapture:paymentInfo withError:&error];
+                                                             self->messageLabel.text=@"Processing Capture";
+                                                             if(error) {
+                                                                 [self->call1 APPLog:@"processCapture Error:%lld",(long long)error.code];
+                                                                 return ;
                                                              }
                                                              
                                                          }];
@@ -621,172 +687,70 @@
         
         
     }
-    
-    
     UIAlertAction* cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleDefault
-                                                         handler:^(UIAlertAction * action) {
-                                                             
-                                                             //result=@"cancel"
-                                                             
-                                                         }];
-    
+                                                         handler:^(UIAlertAction * action) {}];
     [inforAlert addAction:cancelAction];
-    
     [self presentViewController:inforAlert animated:YES completion:nil];
-    
-    
-    
-}
--(IBAction)capBtnClicked:(id)sender
-{
-    
-    //[call1 processCapture:paymentInfo withError:&error];
-    if([amountField.text isEqualToString:@"0.00"]||amountField.text.length==0)
-    {
-        [self ErrorAlert:@"Enter Amount First"];
-    }
-    else{
-        NSString *    filestr;
-        if([call1.currentModule isEqualToString:@"CALLAudio"])
-        {
-            filestr = [file readFile:@"Records" atFile:CFAUTH];
-        }else if([call1.currentModule isEqualToString:@"MP200"])
-        {
-            filestr = [file readFile:@"Records" atFile:UPAUTH];
-        }
-        NSDictionary *filedic= [file StringToDictionary:filestr];
-        NSArray *recordsArray= [filedic objectForKey:@"data"];
-        UIAlertController* inforAlert = [UIAlertController alertControllerWithTitle:@"Processing Capture" message:@"please select Transaction"   preferredStyle:UIAlertControllerStyleAlert];
-        NSInteger counter=0;
-        for (NSDictionary *res in recordsArray)
-        {
-            NSString *cardinfostr= [res objectForKey:@"Cardinfo"];
-            NSLog(@"%@",cardinfostr);
-            NSDictionary * cardinfo = [file StringToDictionary:cardinfostr];
-            NSString * title=[NSString stringWithFormat:@"%@*******%@,%@",[cardinfo objectForKey:@"First6"],[cardinfo objectForKey:@"Last4"], [res objectForKey:@"AuthCode"]];
-            UIAlertAction* okAction = [UIAlertAction actionWithTitle:title style:UIAlertActionStyleDefault
-                                                             handler:^(UIAlertAction * action) {
-                                                                 //result=@"ok"
-                                                                 NSError *error;
-                                                                 
-                                                                 selectedIndex = counter;
-                                                                 NSDictionary *paymentInfo=[self buildDictforcap:[res objectForKey:@"Reference"] withAmount:amountField.text andCardinfo:cardinfo]; //[self buildDictforrtn:[res objectForKey:@"AuthCode"] withCurrency:@"USD" andAmount:[res objectForKey:@"AuthorizedAmount"]];
-                                                                 [call1 processCapture:paymentInfo withError:&error];
-                                                                 messageLabel.text=@" ";
-                                                                 if(error)
-                                                                 {
-                                                                     [call1 APPLog:@" processCapture Error:%lld",(long long)error.code];
-                                                                     return ;
-                                                                 }
-                                                                 
-                                                             }];
-            [inforAlert addAction:okAction];
-            counter ++;
-            
-            
-        }
-        
-        
-        UIAlertAction* cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleDefault
-                                                             handler:^(UIAlertAction * action) {
-                                                                 
-                                                                 //result=@"cancel"
-                                                                 
-                                                             }];
-        
-        [inforAlert addAction:cancelAction];
-        
-        [self presentViewController:inforAlert animated:YES completion:nil];
-        
-        
-        /*UIAlertController* inforAlert = [UIAlertController alertControllerWithTitle:@"Processing capture" message:@"please enter the reference"   preferredStyle:UIAlertControllerStyleAlert];
-         
-         
-         
-         [inforAlert addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
-         
-         
-         }];
-         UIAlertAction* okAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault
-         handler:^(UIAlertAction * action) {
-         //result=@"ok"
-         NSError *error;
-         NSLog(@"%@",inforAlert.textFields.firstObject.text);
-         if(inforAlert.textFields.firstObject.text.length>0&&amountField.text.length>0)
-         {
-         NSDictionary *paymentInfo = [self buildDictforcap:inforAlert.textFields.firstObject.text withAmount:amountField.text];
-         [call1 processCapture:paymentInfo withError:&error];
-         messageLabel.text=@" ";
-         }
-         
-         }];
-         UIAlertAction* cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleDefault
-         handler:^(UIAlertAction * action) {
-         
-         //result=@"cancel"
-         
-         }];
-         [inforAlert addAction:okAction];
-         [inforAlert addAction:cancelAction];
-         
-         [self presentViewController:inforAlert animated:YES completion:nil];
-         
-         messageLabel.text=@" ";*/
-    }
 }
 
+/**
+ Start sale transaction
+
+ @param sender evnet
+ */
 -(IBAction)saleBtnClicked:(id)sender
 {
-    
     messageLabel.text=@"";
     NSError *error;
     [amountField resignFirstResponder];
-    
-    if([amountField.text isEqualToString:@"0.00"]||amountField.text.length==0)
-    {
+    if([amountField.text isEqualToString:@"0.00"]||amountField.text.length==0) {
         [self ErrorAlert:@"Enter Amount First"];
     }
     else{
-        [informationLabel setText:@"start Transaction:"];
-        NSDictionary *saleDict=[self buildSaleDict:amountField.text withTender:@"credit"];
+        [messageLabel setText:@"start Transaction:"];
+        NSDictionary *saleDict = [self buildSaleDict:amountField.text withTender:@"credit"];
         [call1 processSale:saleDict withError:&error];
-        if(error)
-        {
+        if(error){
             [call1 APPLog:@" processSale Error:%lld",(long long)error.code];
             return ;
         }
-        [self updateInformationLabel:@"Please Swipe/dip Card"];
     }
     
 }
+/**
+ Start Auth transaction
+ @param sender evnet
+ */
 -(IBAction)authBtnClicked:(id)sender
 {
     messageLabel.text=@"";
     NSError *error;
     [amountField resignFirstResponder];
-    
     if([amountField.text isEqualToString:@"0.00"]||amountField.text.length==0)
     {
         [self ErrorAlert:@"Enter Amount First"];
     }
     else{
-        [informationLabel setText:@"start Transaction:"];
+        [messageLabel setText:@"start Transaction:"];
         NSDictionary *authDict=[self buildAuthDict:amountField.text withTender:@"credit"];
         [call1 processAuthorization:authDict withError:&error];
-        if(error)
-        {
+        if(error) {
             [call1 APPLog:@" processAuth Error:%lld",(long long)error.code];
             
             return ;
         }
-        [self updateInformationLabel:@"Please Swipe/dip Card"];
     }
     
 }
+/**
+ get pinpad list first, and generate a menu for user to select
+ @param sender evnet
+ */
 -(IBAction)selectPinPadClicked:(id)sender
 {
     NSArray * devlise=[call1 getPinpadList];
-    if ([devlise count]==0)
+    // if no pinpad
+    if ([devlise count] == 0)
     {
         [self ErrorAlert:@"No Pinpad"];
         return;
@@ -794,20 +758,23 @@
     UIAlertController* alert = [UIAlertController alertControllerWithTitle:@"DeviceList"
                                                                    message:@"Please Select one"
                                                             preferredStyle:UIAlertControllerStyleAlert];
-    NSInteger counter=0;
-    for(counter=0;counter<[devlise count];counter++)
-        
-    {
+    NSInteger counter = 0;
+    for(counter=0;counter<[devlise count];counter++){
         UIAlertAction* defaultAction = [UIAlertAction actionWithTitle:[devlise objectAtIndex:counter] style:UIAlertActionStyleDefault
                                                               handler:^(UIAlertAction * action) {
                                                                   NSError * err;
-                                                                  [call1 selectPinPad:[devlise objectAtIndex:counter] configurationError:&err];
+                                                                  [self->call1 selectPinPad:[devlise objectAtIndex:counter] configurationError:&err];
                                                               }];
-        
         [alert addAction:defaultAction];
     }
     [self presentViewController:alert animated:YES completion:nil];
 }
+
+/**
+ start connect pinpad
+
+ @param sender event
+ */
 -(IBAction)connectPinpadClicked:(id)sender
 {
     [self connectPinPad];
@@ -816,91 +783,136 @@
     [sender resignFirstResponder];
 }
 
+/**
+ init the library, it just need token to
+
+ @param sender event
+ */
 -(IBAction)initbtnClicked:(id)sender
 {
-    informationLabel.text=@"";
+    messageLabel.text = @"";
     [self updateInformationLabel:@"Start"];
-tokenField.text=@"3fyl02KZBOERy7yEd6SkWqbuYmGqHQ2T";//cardflight
-    if([tokenField.text isEqual:[NSNull null]]||tokenField.text.length==0)
-    {
+    //tokenField.text=@"phQP9iBIEgl4nEFi8vQmFf25q6m8PieC";//creditcall
+    //tokenField.text=@"JHjBXXjnC0FIHTTmweKrVsA797FPlJLj";//cardflight
+    //tokenField.text=@"teiU6f4zf6dBx9oGDKx4bBxOqmADhAWG";//USEAEPAY
+    //tokenField.text=@"2l588Thtu6dfFamFKg4JAYCn5XlUzqoC";//USAEPAyLive
+    //tokenField.text=@"1FgJZnjTAfBVi3fWysrnPpxIdGxTfNls";//creditcall
+    tokenField.text=@"3fyl02KZBOERy7yEd6SkWqbuYmGqHQ2T";//cardflight;
+    //tokenField.text = @"1FgJZnjTAfBVi3fWysrnPpxIdGxTfNls";//creditcall
+    if([tokenField.text isEqual:[NSNull null]]||tokenField.text.length==0){
         [self updateInformationLabel:@"Enter CMS Token Please"];
-        
         return;
     }
-    //call1 =[[CallOne alloc] initwith:tokenField.text fromServer:@"https://api-staging.slycepay.com" Delegate:self];
-    call1 =[[CallOne alloc] initwith:tokenField.text fromServer:@"" Delegate:self];
-    
-    //[call1 setProduction:demoProductionSwitch.on];
+    call1 = [[CallOne alloc] initwith:tokenField.text fromServer:@"" Delegate:self];
+    //setting debug mode if token is production, the setting would not working
     [call1 setfilemode:NO];
     [call1 setLogMode:YES];
     [tokenField resignFirstResponder];
-    NSLog(@"%@",  [[NSUserDefaults standardUserDefaults] objectForKey:@"ROOT_API_URL" ]);
-    
-    
+}
+-(IBAction)clearlogs:(id)sender
+{
+    //[call1 RSAtest];
+    [call1 ClearLog];
 }
 
+/**
+ when libary need confirm card
+
+ @param cardinfo <#cardinfo description#>
+ */
 -(void)confirmcard: (NSString *) cardinfo
 {
     UIAlertController* confirmAlert = [UIAlertController alertControllerWithTitle:@"Please confirm Card"
                                                                           message:cardinfo
                                                                    preferredStyle:UIAlertControllerStyleAlert];
-    
     UIAlertAction* yesAction = [UIAlertAction actionWithTitle:@"YES" style:UIAlertActionStyleDefault
                                                       handler:^(UIAlertAction * action) {
-                                                          [call1 cardinfoConfirmed:YES];
+                                                          [self->call1 cardinfoConfirmed:YES];
                                                       }];
     UIAlertAction* noAction = [UIAlertAction actionWithTitle:@"NO" style:UIAlertActionStyleDefault
                                                      handler:^(UIAlertAction * action) {
-                                                         [call1 cardinfoConfirmed:NO];
+                                                         [self->call1 cardinfoConfirmed:NO];
                                                      }];
-    
     [confirmAlert addAction:yesAction];
     [confirmAlert addAction:noAction];
-    
     [self presentViewController:confirmAlert animated:YES completion:nil];
-    
 }
 
 
 
 
 #pragma mark Utilis
+
+/**
+ init all files
+ */
+-(void) initFiles {
+    file = [[FileControl alloc]init];
+    [file deleteFile:@"Records" theFile:CCRETURN];
+    [file deleteFile:@"Records" theFile:CFRETURN];
+    [file createRecordFile:CCSALE];
+    [file createRecordFile:CCRETURN];
+    [file createRecordFile:CFSALE];
+    [file createRecordFile:CFRETURN];
+    [file createRecordFile:CFAUTH];
+    [file createRecordFile:CFCAPTURE];
+    [file createRecordFile:UPSALE];
+    [file createRecordFile:UPRETURN];
+    [file createRecordFile:UPAUTH];
+    [self processTokenfile];
+
+}
+
+/**
+ transfer json string to nsdictionary
+
+ @param jsonString JSON
+ @return NSDictionary
+ */
 -(NSDictionary *)dictionaryWithJsonString:(NSString *)jsonString
 {
     if (jsonString == nil) {
         return nil;
     }
-    
     NSData *jsonData = [jsonString dataUsingEncoding:NSUTF8StringEncoding];
     NSError *err;
-    NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:jsonData
-                                                        options:NSJSONReadingMutableContainers
-                                                          error:&err];
-    if(err)
-    {
+    NSDictionary *dic;
+    dic = [NSJSONSerialization JSONObjectWithData:jsonData
+                                          options:NSJSONReadingMutableContainers
+                                            error:&err];
+    if(err){
         NSLog(@"jsonfailure：%@",err);
         return nil;
     }
     return dic;
 }
+
+/**
+ valid amount input if not number, return NO otherwise return YES
+
+ @param inputstr input string
+ @return YES validated NO invalid
+ */
 - (BOOL)validInput:(NSString*)inputstr {
-    
     if (inputstr.length == 0)  //delete operation
         return YES;
-    
     int asciiCode = [inputstr characterAtIndex:0];
-    
     if (asciiCode >= 48 && asciiCode <= 57)
         return YES;
     else
         return NO;
+/**
+ format amount string from 123 to 1.23 for display
+
+ @param NSString amount string
+ @return formatted amount string
+ */
 }
 -(NSString *) formatAmountStr: (NSString *) basicAmt withInput:(NSString*) input
 {
     NSString * temper=basicAmt;
     NSString * header;
     NSString * tail;
-    
     if ([self validInput:input])
     {
         temper =[temper stringByAppendingString:input];
@@ -918,16 +930,16 @@ tokenField.text=@"3fyl02KZBOERy7yEd6SkWqbuYmGqHQ2T";//cardflight
                 return temper;
                 break;
             case 1:
-                temper =[NSString stringWithFormat:@"0.0%@",temper];
+                temper = [NSString stringWithFormat:@"0.0%@",temper];
                 
                 break;
             case 2:
-                temper =[NSString stringWithFormat:@"0.%@",temper];
+                temper = [NSString stringWithFormat:@"0.%@",temper];
                 break;
             default:
-                header= [temper substringToIndex:temper.length-2];
-                tail =[temper substringFromIndex:temper.length-2];
-                temper=[NSString stringWithFormat:@"%@.%@",header,tail];
+                header = [temper substringToIndex:temper.length-2];
+                tail = [temper substringFromIndex:temper.length-2];
+                temper = [NSString stringWithFormat:@"%@.%@",header,tail];
                 break;
         }
         
@@ -937,26 +949,46 @@ tokenField.text=@"3fyl02KZBOERy7yEd6SkWqbuYmGqHQ2T";//cardflight
     return temper;
 }
 
+/**
+ Build Sale Dictionary
+ @param amount Amount String
+ @param tender Tender information credit debit
+ @return NSDictionary for sale transaction
+ */
 -(NSDictionary*) buildSaleDict:(NSString*) amount withTender:(NSString*) tender
 {
-    NSString* amountValue= [amount stringByReplacingOccurrencesOfString:@"." withString:@""];
-    
-    NSArray *key=[[NSArray alloc] initWithObjects:@"Amount",@"Tender", nil];
-    NSArray *value= [[NSArray alloc] initWithObjects:amountValue,tender,nil];
-    NSDictionary *t=[[NSDictionary alloc]initWithObjects:value forKeys:key];
+    NSString* amountValue = [amount stringByReplacingOccurrencesOfString:@"." withString:@""];
+    NSArray *key = [[NSArray alloc] initWithObjects:@"Amount",@"Tender", nil];
+    NSArray *value = [[NSArray alloc] initWithObjects:amountValue,tender,nil];
+    NSDictionary *t = [[NSDictionary alloc]initWithObjects:value forKeys:key];
     
     return t;
 }
+/**
+ Build Auth Dictionary
+ @param amount Amount String
+ @param tender Tender information credit
+ @return NSDictionary for void transaction
+ */
 -(NSDictionary*) buildAuthDict:(NSString*) amount withTender:(NSString*) tender
 {
     NSString* amountValue= [amount stringByReplacingOccurrencesOfString:@"." withString:@""];
-    
     NSArray *key=[[NSArray alloc] initWithObjects:@"Amount",@"Tender", nil];
     NSArray *value= [[NSArray alloc] initWithObjects:amountValue,tender,nil];
     NSDictionary *t=[[NSDictionary alloc]initWithObjects:value forKeys:key];
     
     return t;
 }
+
+/**
+ Build return Dictionary
+
+ @param referencestr reference of origional transaction
+ @param currency "USD"
+ @param amount Formated amount value
+ @param card cardinformation if no present, the value will be all '0's as defalut
+ @return NSDictionary for return transaction
+ */
 -(NSDictionary*) buildDictforrtn:(NSString*) referencestr withCurrency:(NSString*)currency andAmount:(NSString*)amount cardinfo:(NSString*) card
 {
     
@@ -968,35 +1000,48 @@ tokenField.text=@"3fyl02KZBOERy7yEd6SkWqbuYmGqHQ2T";//cardflight
     return t;
 }
 
+/**
+ Build Capture Dictionary
+
+ @param referencestr referencestr reference of origional transaction
+ @param amount Amount String 100 as 1.00
+ @param dic cardinfo if not present, the value will be all '0's as default
+ @return capture Dictionray
+ */
 -(NSDictionary*) buildDictforcap:(NSString*) referencestr withAmount:(NSString*)amount andCardinfo:(NSDictionary*)dic
 {
     NSString* amountValue= [amount stringByReplacingOccurrencesOfString:@"." withString:@""];
-    
-    
     NSArray *key=[[NSArray alloc] initWithObjects:@"Reference",@"Amount",@"description",@"Cardinfo", nil];
     NSArray *value= [[NSArray alloc] initWithObjects:referencestr,amountValue,@"",[file dictionaryToString:dic],nil];
     NSDictionary *t=[[NSDictionary alloc]initWithObjects:value forKeys:key];
     
-    
+   // t =  @{@"Amount":@"",@"Reference":@""};
     return t;
 }
 
+/**
+ Show result for transactions
+
+ @param message transaction result JSON string
+ */
 -(void) showResult:(NSString *) message
 {
     UIAlertController* errorAlert = [UIAlertController alertControllerWithTitle:@"Result"
                                                                         message:message
                                                                  preferredStyle:UIAlertControllerStyleAlert];
-    
     UIAlertAction* okAction = [UIAlertAction actionWithTitle:@"ok" style:UIAlertActionStyleDefault
                                                      handler:^(UIAlertAction * action) {
                                                      }];
-    
     [errorAlert addAction:okAction];
-    
     [self presentViewController:errorAlert animated:YES completion:nil];
     
 }
 
+/**
+ show errors such as no amount etc
+
+ @param message error message
+ */
 -(void)ErrorAlert: (NSString *) message
 {
     UIAlertController* errorAlert = [UIAlertController alertControllerWithTitle:@"Error"
@@ -1012,16 +1057,106 @@ tokenField.text=@"3fyl02KZBOERy7yEd6SkWqbuYmGqHQ2T";//cardflight
     [self presentViewController:errorAlert animated:YES completion:nil];
     
 }
-
--(IBAction)clearlogs:(id)sender
-{
-    //[call1 RSAtest];
-    [call1 ClearLog];
+/**
+ start pinpad connection to library, if TMS is required, it will proceed the TMS update
+ */
+-(void)connectPinPad {
+    NSError * error;
+    [call1 connectPinPad:&error];
+    // check error, if tms error, then start tem, otherwise show error
+    if (error) {
+        if(error.code == CALLTMSUpdateRequired) {
+            [ call1 APPLog:@" connectPinPad %lld",(long long)error.code ];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self updateInformationLabel:[NSString stringWithFormat:@" connectPinPad %lld",(long long)error.code]];
+                [self updateInformationLabel:@"Trying TMS update"];});
+            [call1 TMSupdate:&error];
+            [call1 APPLog:@"TMSupdate  error %lld",(long long)error.code];
+        }
+        else {
+            [self ErrorAlert:error.description];
+        }
+    }
 }
--(IBAction)toWebView:(id)sender
+
+/**
+ if token file CMSTokens.txt is exist, then it will pop up the select menu and asking user to selecte
+ */
+-(void) processTokenfile{
+    @try {
+        NSString * res = [file readFile:@"" atFile:@"CMSTokens.txt"];
+        NSDictionary *tokendic = [file StringToDictionary2:res];
+        NSArray *tokenarray = [tokendic objectForKey:@"CMSTokens"];
+        UIAlertController* inforAlert = [UIAlertController alertControllerWithTitle:@"CMS Token List"
+                                                                            message:@"Please Select Token" preferredStyle:UIAlertControllerStyleAlert];
+        for (NSDictionary *token in tokenarray){
+            UIAlertAction* okAction = [UIAlertAction actionWithTitle:[token objectForKey:@"Token"] style:UIAlertActionStyleDefault
+                                                             handler:^(UIAlertAction * action) {
+                                                                 [self -> tokenField setText:[token objectForKey:@"Token"]];
+                                                                 if ([[token objectForKey:@"Production"] isEqualToString:@"True"]) {
+                                                                     
+                                                                 }
+                                                                 [self initbtnClicked:nil];
+                                                             }];
+            [inforAlert addAction:okAction];
+        }
+        UIAlertAction* cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleDefault
+                                                             handler:^(UIAlertAction * action) {}];
+        [inforAlert addAction:cancelAction];
+        [self presentViewController:inforAlert animated:YES completion:nil];
+    } @catch (NSException *exception) {
+        NSLog(@"no token");
+    }
+}
+
+
+-(NSString*)formatAmount:(NSString*)amountstr
 {
-    WebViewController * webviewcontroller= [[WebViewController alloc]init];
-    [self presentViewController:webviewcontroller animated:YES completion:nil];
+    NSString * res;
+    NSRange range;
+    NSString * header;
+    NSString * tail;
+    @try
+    {
+        range = [amountstr rangeOfString:@"."];
+        
+        res = [amountstr stringByReplacingOccurrencesOfString:@"$"withString:@""];
+        if (range.location==NSNotFound)
+        {
+            switch (res.length) {
+                case 0:
+                    return @"0.00";
+                    break;
+                case 1:
+                    res =[NSString stringWithFormat:@"0.0%@",res];
+                    
+                    break;
+                case 2:
+                    res =[NSString stringWithFormat:@"0.%@",res];
+                    break;
+                default:
+                    header= [res substringToIndex:res.length-2];
+                    tail =[res substringFromIndex:res.length-2];
+                    res=[NSString stringWithFormat:@"%@.%@",header,tail];
+                    break;
+            }
+        }else {
+            NSLog(@"rang.location %ld, %ld", range.location, res.length);
+            if(range.location+2 == res.length)
+            {
+                return [NSString stringWithFormat:@"%@0",res];
+            }
+        }
+    }
+    @catch(NSException *e)
+    {
+        return @"0.00";
+    }
+    if([res isEqual:[NSNull null]]||res==nil)
+    {
+        res=@"0.00";
+    }
+    return res;
 }
 
 
