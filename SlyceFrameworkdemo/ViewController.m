@@ -7,10 +7,9 @@
 //
 
 #import "ViewController.h"
-#import <Call1/Call1.h>
+#import <SlycePay/SlycePay.h>
 #import "ResultViewController.h"
 #import "FileControl+Recorder.h"
-#import "WebViewController.h"
 #define CCSALE @"CCSALE"
 #define CCRETURN @"CCRETURN"
 //cardflight
@@ -23,7 +22,7 @@
 #define UPRETURN  @"UPRETURN"
 #define UPAUTH    @"UPAUTH"
 @interface ViewController ()<UITextFieldDelegate>
-@property (nonatomic,retain) CallOne * call1;
+@property (nonatomic,retain) SlycePay * slycepay;
 @property (nonatomic,retain) NSArray * PinPads;
 @property (nonatomic,retain)FileControl * file;
 @property NSInteger selectedIndex;
@@ -31,14 +30,13 @@
 @end
 
 @implementation ViewController
-@synthesize call1;
+@synthesize slycepay;
 @synthesize initialLibbtn;
 @synthesize salebtn;
 @synthesize returnbtn;
 @synthesize amountField;
 @synthesize tokenField;
 @synthesize connetPinBtn;
-@synthesize selectPinPadBtn;
 @synthesize messageLabel;
 @synthesize authBtn;
 @synthesize capBtn;
@@ -52,7 +50,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self initComponents];
-    self.title = @"CMS Demo C";
+    self.title = @"CMS demo";
     [self initFiles];
 }
 
@@ -90,50 +88,22 @@
 }
 
 /**
- Triggered when TMS update is finished, and notify the result
-
- @param error error messages
- */
--(void)TMSupdateComplete:(NSError*)error {
-    [call1 APPLog:@"TMSupdateComplete Completed"];
-    [self updateInformationLabel:@"TMS update Completed"];
-    // if error show error
-    if(error){
-        dispatch_async(dispatch_get_main_queue(), ^{
-        [self updateInformationLabel:[NSString stringWithFormat:@"Error %lld",(long long)error.code]];
-        });
-        [call1 APPLog:@" TMSupdateComplete %lld",(long long)error.code];
-        return;
-    }
-    // no error procedure the connect pinpad
-    dispatch_async(dispatch_get_main_queue(), ^{
-    [self updateInformationLabel:@"Try Connect Pin Pad"];});
-    [call1 connectPinPad:&error];
-    if(error) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-        [self updateInformationLabel:[NSString stringWithFormat:@" connectPinPad2 %lld",(long long)error.code]];
-        });
-        [call1 APPLog:@" connectPinPad2 %lld",(long long)error.code];
-    }
-
-}
-
-/**
  Triggered when pinpad connectiong is finished
 
  @param error pinpad connection errors, if no error it is nil
  */
--(void)PinpadconnectionComplete:(NSError*)error
+-(void)deviceconnectionComplete:(NSError*)error
 {
     if(error) {
         dispatch_async(dispatch_get_main_queue(), ^{
-        [self updateInformationLabel:[NSString stringWithFormat:@" PinpadconnectionComplete %lld",(long long)error.code]];
+        [self updateInformationLabel:[NSString stringWithFormat:@" deviceconnectionComplete %lld",(long long)error.code]];
         });
-        [call1 APPLog:@" PinpadconnectionComplete %lld",(long long)error.code];
+        [slycepay APPLog:@" deviceconnectionComplete %lld",(long long)error.code];
         return;
     }
     dispatch_async(dispatch_get_main_queue(), ^{
     [self enableTransaction];
+    [self updateInformationLabel:@"device connected"];
     });
 
 }
@@ -145,7 +115,7 @@
  */
 -(void)transAuthorizationCompleted:(NSDictionary *)resultDict
 {
-    [call1 APPLog:@"%@",resultDict.description];
+    [slycepay APPLog:@"%@",resultDict.description];
     // if no error store the transaction and show it
     if([resultDict objectForKey:@"error"] == nil) {
         resultView = [[ResultViewController alloc]init];
@@ -156,12 +126,11 @@
         resultView.card = [NSString stringWithFormat:@"**************%@",[carddict objectForKey:@"Last4"]];
         resultView.reference = [resultDict objectForKey:@"Reference"];
         NSString * amountv = [NSString stringWithFormat:@"%@", [resultDict objectForKey:@"AuthorizedAmount"]];
-        NSString * amountstr = [[NSString alloc]init];
-        amountstr = [self formatAmountStr:amountstr withInput:amountv];
+        NSString * amountstr = [self formatAmount:amountv];
         resultView.amount = amountstr;
         dispatch_async(dispatch_get_main_queue(), ^{
             [self.navigationController pushViewController:self -> resultView animated:YES];
-            if([self -> call1.currentModule isEqualToString:@"B200"]) {
+            if([self -> slycepay.currentModule isEqualToString:@"B200"]) {
                 [self -> file addRecord:resultDict fromFile:CFAUTH];
             }
             else {
@@ -189,12 +158,12 @@
  */
 -(void)transactionSaleCompleted:( NSDictionary *)resultDict
 {
-    [call1 APPLog:@"APP sale completed %@",resultDict.description];
+    [slycepay APPLog:@"APP sale completed %@",resultDict.description];
     @try {
         NSString *jsonString = [file dictionaryToString:resultDict];
-        [call1 APPLog:@"APP sale JSON %@",jsonString];
+        [slycepay APPLog:@"APP sale JSON %@",jsonString];
     } @catch (NSException *exception) {
-          [call1 APPLog:@"APP sale exception %@",exception.description];
+          [slycepay APPLog:@"APP sale exception %@",exception.description];
     }
     // if no error show approved and store the transaction
     if([resultDict objectForKey:@"error"] ==nil)
@@ -211,8 +180,7 @@
         }
         resultView.reference = [resultDict objectForKey:@"Reference"];
         NSString * amountv = [NSString stringWithFormat:@"%@", [resultDict objectForKey:@"AuthorizedAmount"]];
-        NSString * amountstr = [[NSString alloc]init];
-        amountstr = [self formatAmountStr:amountstr withInput:amountv];
+        NSString * amountstr =  [self formatAmount:amountv];
         resultView.amount = amountstr;
         dispatch_async(dispatch_get_main_queue(), ^{
                 [self.navigationController pushViewController:self->resultView animated:YES];
@@ -251,14 +219,14 @@
                                                                         message:@"Please Verify Signature" preferredStyle:UIAlertControllerStyleAlert];
     UIAlertAction* okAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault
                                                      handler:^(UIAlertAction * action) {
-                                                         [self->call1 signatureVerified:YES];
+                                                         [self->slycepay signatureVerified:YES];
 
                                                          
                                                      }];
     UIAlertAction* cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleDefault
                                                          handler:^(UIAlertAction * action) {
                                                              
-                                                             [self->call1 signatureVerified:NO];
+                                                             [self->slycepay signatureVerified:NO];
 
                                                              
                                                          }];
@@ -277,16 +245,16 @@
  */
 -(void)transactionReturnCompleted:(NSDictionary *)resultDict
 {
- [call1 APPLog:@"return APP %@",resultDict];
-    [call1 APPLog:@"%@",[resultDict objectForKey:@"Transtype"]];
+ [slycepay APPLog:@"return APP %@",resultDict];
+    [slycepay APPLog:@"%@",[resultDict objectForKey:@"Transtype"]];
     dispatch_async(dispatch_get_main_queue(), ^{
         if ([resultDict objectForKey:@"Error"] ==nil)
         {
-            if([self->call1.currentModule isEqualToString:@"B200"])
+            if([self->slycepay.currentModule isEqualToString:@"B200"])
             {
                 [self->file removedRecord:self->selectedIndex fromFile:CFSALE];
                 [self->file addRecord:resultDict fromFile:CFRETURN];
-            }else if([self->call1.currentModule isEqualToString:@"MP200"])
+            }else if([self->slycepay.currentModule isEqualToString:@"MP200"])
             {
                 [self->file removedRecord:self->selectedIndex fromFile:UPSALE];
                 [self->file addRecord:resultDict fromFile:UPRETURN];
@@ -313,14 +281,14 @@
  */
 -(void)transactionCaptureCompleted:(NSDictionary *)resultDict
 {
-   [call1 APPLog:@"APP capture %@",resultDict];
+   [slycepay APPLog:@"APP capture %@",resultDict];
     if ([resultDict objectForKey:@"error"] == nil)
     {
-        if([call1.currentModule isEqualToString:@"CALLAudio"])
+        if([slycepay.currentModule isEqualToString:@"CALLAudio"])
         {
             [file removedRecord:selectedIndex fromFile:CFAUTH];
             [file addRecord:resultDict fromFile:CFSALE];
-        }else if([call1.currentModule isEqualToString:@"MP200"])
+        }else if([slycepay.currentModule isEqualToString:@"MP200"])
         {
             [file removedRecord:selectedIndex fromFile:UPAUTH];
             [file addRecord:resultDict fromFile:UPSALE];
@@ -357,13 +325,13 @@
     UIAlertAction* okAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault
                                                      handler:^(UIAlertAction * action) {
                                                          UITextField *infoTextfield= inforAlert.textFields.firstObject;
-                                                             [self->call1 phoneReferral:YES withAuthcode:infoTextfield.text];
+                                                             [self->slycepay phoneReferral:YES withAuthcode:infoTextfield.text];
                                                          
                                                      }];
     UIAlertAction* cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleDefault
                                                      handler:^(UIAlertAction * action) {
                                                          
-                                                         [self->call1 phoneReferral:NO withAuthcode:@""];
+                                                         [self->slycepay phoneReferral:NO withAuthcode:@""];
                                                          
                                                      }];
 
@@ -381,7 +349,7 @@
  */
 -(void) Pinpaddisattached
 {
-    [call1 APPLog:@" pinpad disattached"];
+    [slycepay APPLog:@" pinpad disattached"];
 }
 
 /**
@@ -389,7 +357,7 @@
  */
 -(void)Pinpadattached
 {
-    [call1 APPLog:@" pinpad attached"];
+    [slycepay APPLog:@" pinpad attached"];
     [self enableDevice];
     //call1=[[CallOne alloc] initwith:@"cem_123" fromServer:nil Delegate:self];
     //[call1 setLogMode:YES];
@@ -403,7 +371,7 @@
 }
 
 - (void)transactionVoidCompleted:(NSDictionary *)resultDict {
-    [call1 APPLog:@"APP void %@",resultDict];
+    [slycepay APPLog:@"APP void %@",resultDict];
     if ([resultDict objectForKey:@"error"] ==nil)
     {
         
@@ -421,13 +389,18 @@
     }
 }
 
+- (void)TMSupdateComplete:(NSError *)error {
+    
+}
+
+
 
 
 #pragma mark textField delgate
 
 /**
  hide keyboard
-
+ 
  @param textField the object texfield
  @return return YES to hide keyboard
  */
@@ -437,7 +410,7 @@
     return YES;
 }
 /**
-    format the input
+ format the input
  */
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string{
     NSString * temper = textField.text;
@@ -458,7 +431,7 @@
 
 /**
  upldate message on the label
-
+ 
  @param content display messages
  */
 -(void)updateInformationLabel:(NSString *) content {
@@ -467,7 +440,6 @@
 
 -(void) initComponents {
     [amountField setEnabled:NO];
-    [selectPinPadBtn setEnabled:NO];
     [connetPinBtn setEnabled:NO];
     [salebtn setEnabled:NO];
     [returnbtn setEnabled:NO];
@@ -480,7 +452,6 @@
 
 -(void) enableDevice
 {
-    [selectPinPadBtn setEnabled:YES];
     [connetPinBtn setEnabled:YES];
 }
 -(void) enableTransaction
@@ -496,7 +467,6 @@
 -(void) disableAll
 {
     [amountField setEnabled:NO];
-    [selectPinPadBtn setEnabled:NO];
     [connetPinBtn setEnabled:NO];
     [salebtn setEnabled:NO];
     [returnbtn setEnabled:NO];
@@ -511,12 +481,12 @@
 
 /**
  Cancel the transaction, not working for all modules
-
+ 
  @param sender events
  */
 -(IBAction)cnlBtnClicked:(id)sender
 {
-    [call1 terminateTransaction];
+    [slycepay terminateTransaction];
 }
 /**
  Void the transaction, get the trans file first, then build the transaction menu.
@@ -526,11 +496,11 @@
 -(IBAction)voidBtnClicked:(id)sender {
     NSString * filestr;
     // get the transaction file name
-    if([call1.currentModule isEqualToString:@"MP200"]){
+    if([slycepay.currentModule isEqualToString:@"MP200"]){
         filestr = [file readFile:@"Records" atFile:UPSALE];
-    }else if([call1.currentModule isEqualToString:@"Miura 125"]){
+    }else if([slycepay.currentModule isEqualToString:@"Miura 865"]){
         filestr = [file readFile:@"Records" atFile:CCSALE];
-    }else if([call1.currentModule isEqualToString:@"B200"]){
+    }else if([slycepay.currentModule isEqualToString:@"B200"]){
         filestr = [file readFile:@"Records" atFile:CFSALE];
     }
     else {
@@ -558,9 +528,9 @@
                                                              self->selectedIndex = counter;
                                                              //build paymentinfo dict for the transaction
                                                              NSDictionary *paymentInfo= [self buildDictforrtn:[res objectForKey:@"Reference"] withCurrency:@"USD" andAmount:[res objectForKey:@"AuthorizedAmount"] cardinfo:cardinfostr];
-                                                             [self->call1 processVoid:paymentInfo withError:&error];
+                                                             [self->slycepay processVoid:paymentInfo withError:&error];
                                                              self->messageLabel.text = @"Processing Void";
-                                                             [self->call1 APPLog:@"return is selected %@",paymentInfo.description ];
+                                                             [self->slycepay APPLog:@"void is selected %@",paymentInfo.description ];
                                                              if (error) {
                                                                  NSString * msg = [NSString stringWithFormat:@"return error %@",error.description];
                                                                  [self showResult:msg];
@@ -589,11 +559,11 @@
 {
     // get the transaction file name
     NSString * filestr;
-    if([call1.currentModule isEqualToString:@"B200"]){
+    if([slycepay.currentModule isEqualToString:@"B200"]){
         filestr = [file readFile:@"Records" atFile:CFSALE];
-    }else if([call1.currentModule isEqualToString:@"Miura 125"]) {
+    }else if([slycepay.currentModule isEqualToString:@"Miura 865"]) {
         filestr = [file readFile:@"Records" atFile:CCSALE];
-    }else if([call1.currentModule isEqualToString:@"MP200"]) {
+    }else if([slycepay.currentModule isEqualToString:@"MP200"]) {
         filestr =[file readFile:@"Records" atFile:UPSALE];
     }
     else{
@@ -619,16 +589,16 @@
                                                              self->selectedIndex = counter;
                                                              //build request for return transaction
                                                              NSDictionary *paymentInfo= [self buildDictforrtn:[res objectForKey:@"Reference"] withCurrency:@"USD" andAmount:[res objectForKey:@"AuthorizedAmount"] cardinfo:cardinfostr];
-                                                             [self->call1 processReturn:paymentInfo withError:&error];
+                                                             [self->slycepay processReturn:paymentInfo withError:&error];
                                                              self->messageLabel.text=@"Processing Return";
-                                                             [self->call1 APPLog:@"return is selected %@",paymentInfo.description ];
+                                                             [self->slycepay APPLog:@"return is selected %@",paymentInfo.description ];
                                                              if (error)
                                                              {
                                                                  NSString * msg= [NSString stringWithFormat:@"return error %@",error.description];
                                                                  [self showResult:msg];
                                                              }
                                                              
-                                            }];
+                                                         }];
         [inforAlert addAction:okAction];
         counter ++;
         
@@ -652,9 +622,9 @@
     }
     // get the transaction file name
     NSString * filestr;
-    if([call1.currentModule isEqualToString:@"B200"]) {
+    if([slycepay.currentModule isEqualToString:@"B200"]) {
         filestr = [file readFile:@"Records" atFile:CFAUTH];
-    }else if([call1.currentModule isEqualToString:@"MP200"])
+    }else if([slycepay.currentModule isEqualToString:@"MP200"])
     {
         filestr = [file readFile:@"Records" atFile:UPAUTH];
     }
@@ -662,7 +632,7 @@
     NSArray *recordsArray= [filedic objectForKey:@"data"];
     UIAlertController* inforAlert = [UIAlertController alertControllerWithTitle:@"Processing Capture" message:@"please select Transaction"   preferredStyle:UIAlertControllerStyleAlert];
     NSInteger counter=0;
-        // build the list of transactions
+    // build the list of transactions
     for (NSDictionary *res in recordsArray)
     {
         NSString *cardinfostr= [res objectForKey:@"Cardinfo"];
@@ -674,10 +644,10 @@
                                                              NSError *error;
                                                              self->selectedIndex = counter;
                                                              NSDictionary *paymentInfo = [self buildDictforcap:[res objectForKey:@"Reference"] withAmount:self->amountField.text andCardinfo:cardinfo];
-                                                             [self->call1 processCapture:paymentInfo withError:&error];
+                                                             [self->slycepay processCapture:paymentInfo withError:&error];
                                                              self->messageLabel.text=@"Processing Capture";
                                                              if(error) {
-                                                                 [self->call1 APPLog:@"processCapture Error:%lld",(long long)error.code];
+                                                                 [self->slycepay APPLog:@"processCapture Error:%lld",(long long)error.code];
                                                                  return ;
                                                              }
                                                              
@@ -695,7 +665,7 @@
 
 /**
  Start sale transaction
-
+ 
  @param sender evnet
  */
 -(IBAction)saleBtnClicked:(id)sender
@@ -709,9 +679,9 @@
     else{
         [messageLabel setText:@"start Transaction:"];
         NSDictionary *saleDict = [self buildSaleDict:amountField.text withTender:@"credit"];
-        [call1 processSale:saleDict withError:&error];
+        [slycepay processSale:saleDict withError:&error];
         if(error){
-            [call1 APPLog:@" processSale Error:%lld",(long long)error.code];
+            [slycepay APPLog:@" processSale Error:%lld",(long long)error.code];
             return ;
         }
     }
@@ -733,22 +703,25 @@
     else{
         [messageLabel setText:@"start Transaction:"];
         NSDictionary *authDict=[self buildAuthDict:amountField.text withTender:@"credit"];
-        [call1 processAuthorization:authDict withError:&error];
+        [slycepay processAuthorization:authDict withError:&error];
         if(error) {
-            [call1 APPLog:@" processAuth Error:%lld",(long long)error.code];
+            [slycepay APPLog:@" processAuth Error:%lld",(long long)error.code];
             
             return ;
         }
     }
     
 }
+
+
 /**
- get pinpad list first, and generate a menu for user to select
- @param sender evnet
+ start connect pinpad
+ 
+ @param sender event
  */
--(IBAction)selectPinPadClicked:(id)sender
+-(IBAction)connectPinpadClicked:(id)sender
 {
-    NSArray * devlise=[call1 getPinpadList];
+    NSArray * devlise=[slycepay getDevice];
     // if no pinpad
     if ([devlise count] == 0)
     {
@@ -762,22 +735,12 @@
     for(counter=0;counter<[devlise count];counter++){
         UIAlertAction* defaultAction = [UIAlertAction actionWithTitle:[devlise objectAtIndex:counter] style:UIAlertActionStyleDefault
                                                               handler:^(UIAlertAction * action) {
-                                                                  NSError * err;
-                                                                  [self->call1 selectPinPad:[devlise objectAtIndex:counter] configurationError:&err];
+                                                                  [self connectPinPad:[devlise objectAtIndex:counter]];
                                                               }];
         [alert addAction:defaultAction];
     }
     [self presentViewController:alert animated:YES completion:nil];
-}
-
-/**
- start connect pinpad
-
- @param sender event
- */
--(IBAction)connectPinpadClicked:(id)sender
-{
-    [self connectPinPad];
+    
 }
 -(IBAction)textFiledReturnEditing:(id)sender {
     [sender resignFirstResponder];
@@ -785,40 +748,35 @@
 
 /**
  init the library, it just need token to
-
+ 
  @param sender event
  */
 -(IBAction)initbtnClicked:(id)sender
 {
     messageLabel.text = @"";
     [self updateInformationLabel:@"Start"];
-    //tokenField.text=@"phQP9iBIEgl4nEFi8vQmFf25q6m8PieC";//creditcall
-    //tokenField.text=@"JHjBXXjnC0FIHTTmweKrVsA797FPlJLj";//cardflight
-    //tokenField.text=@"teiU6f4zf6dBx9oGDKx4bBxOqmADhAWG";//USEAEPAY
-    //tokenField.text=@"2l588Thtu6dfFamFKg4JAYCn5XlUzqoC";//USAEPAyLive
-    //tokenField.text=@"1FgJZnjTAfBVi3fWysrnPpxIdGxTfNls";//creditcall
+
     tokenField.text=@"3fyl02KZBOERy7yEd6SkWqbuYmGqHQ2T";//cardflight;
-    //tokenField.text = @"1FgJZnjTAfBVi3fWysrnPpxIdGxTfNls";//creditcall
     if([tokenField.text isEqual:[NSNull null]]||tokenField.text.length==0){
         [self updateInformationLabel:@"Enter CMS Token Please"];
         return;
     }
-    call1 = [[CallOne alloc] initwith:tokenField.text fromServer:@"" Delegate:self];
+    slycepay = [[SlycePay alloc] initwith:tokenField.text Delegate:self];
     //setting debug mode if token is production, the setting would not working
-    [call1 setfilemode:NO];
-    [call1 setLogMode:YES];
+    [slycepay setfilemode:NO];
+    [slycepay setLogMode:YES];
     [tokenField resignFirstResponder];
 }
 -(IBAction)clearlogs:(id)sender
 {
     //[call1 RSAtest];
-    [call1 ClearLog];
+    [slycepay ClearLog];
 }
 
 /**
  when libary need confirm card
-
- @param cardinfo <#cardinfo description#>
+ 
+ @param cardinfo Cardinfo JsonString
  */
 -(void)confirmcard: (NSString *) cardinfo
 {
@@ -827,11 +785,11 @@
                                                                    preferredStyle:UIAlertControllerStyleAlert];
     UIAlertAction* yesAction = [UIAlertAction actionWithTitle:@"YES" style:UIAlertActionStyleDefault
                                                       handler:^(UIAlertAction * action) {
-                                                          [self->call1 cardinfoConfirmed:YES];
+                                                          [self->slycepay cardinfoConfirmed:YES];
                                                       }];
     UIAlertAction* noAction = [UIAlertAction actionWithTitle:@"NO" style:UIAlertActionStyleDefault
                                                      handler:^(UIAlertAction * action) {
-                                                         [self->call1 cardinfoConfirmed:NO];
+                                                         [self->slycepay cardinfoConfirmed:NO];
                                                      }];
     [confirmAlert addAction:yesAction];
     [confirmAlert addAction:noAction];
@@ -860,12 +818,12 @@
     [file createRecordFile:UPRETURN];
     [file createRecordFile:UPAUTH];
     [self processTokenfile];
-
+    
 }
 
 /**
  transfer json string to nsdictionary
-
+ 
  @param jsonString JSON
  @return NSDictionary
  */
@@ -889,7 +847,7 @@
 
 /**
  valid amount input if not number, return NO otherwise return YES
-
+ 
  @param inputstr input string
  @return YES validated NO invalid
  */
@@ -901,13 +859,16 @@
         return YES;
     else
         return NO;
-/**
- format amount string from 123 to 1.23 for display
-
- @param NSString amount string
- @return formatted amount string
- */
+    
 }
+
+/**
+ format amount for
+ 
+ @param basicAmt basic amount inour
+ @param input input amount
+ @return formated amount
+ */
 -(NSString *) formatAmountStr: (NSString *) basicAmt withInput:(NSString*) input
 {
     NSString * temper=basicAmt;
@@ -982,7 +943,7 @@
 
 /**
  Build return Dictionary
-
+ 
  @param referencestr reference of origional transaction
  @param currency "USD"
  @param amount Formated amount value
@@ -1002,7 +963,7 @@
 
 /**
  Build Capture Dictionary
-
+ 
  @param referencestr referencestr reference of origional transaction
  @param amount Amount String 100 as 1.00
  @param dic cardinfo if not present, the value will be all '0's as default
@@ -1015,13 +976,13 @@
     NSArray *value= [[NSArray alloc] initWithObjects:referencestr,amountValue,@"",[file dictionaryToString:dic],nil];
     NSDictionary *t=[[NSDictionary alloc]initWithObjects:value forKeys:key];
     
-   // t =  @{@"Amount":@"",@"Reference":@""};
+    // t =  @{@"Amount":@"",@"Reference":@""};
     return t;
 }
 
 /**
  Show result for transactions
-
+ 
  @param message transaction result JSON string
  */
 -(void) showResult:(NSString *) message
@@ -1039,7 +1000,7 @@
 
 /**
  show errors such as no amount etc
-
+ 
  @param message error message
  */
 -(void)ErrorAlert: (NSString *) message
@@ -1060,22 +1021,13 @@
 /**
  start pinpad connection to library, if TMS is required, it will proceed the TMS update
  */
--(void)connectPinPad {
+-(void)connectPinPad:(NSString*)name {
     NSError * error;
-    [call1 connectPinPad:&error];
+    [slycepay connectDevice:name configerror:&error];
     // check error, if tms error, then start tem, otherwise show error
     if (error) {
-        if(error.code == CALLTMSUpdateRequired) {
-            [ call1 APPLog:@" connectPinPad %lld",(long long)error.code ];
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [self updateInformationLabel:[NSString stringWithFormat:@" connectPinPad %lld",(long long)error.code]];
-                [self updateInformationLabel:@"Trying TMS update"];});
-            [call1 TMSupdate:&error];
-            [call1 APPLog:@"TMSupdate  error %lld",(long long)error.code];
-        }
-        else {
-            [self ErrorAlert:error.description];
-        }
+        
+        [self ErrorAlert:error.description];
     }
 }
 
@@ -1093,9 +1045,6 @@
             UIAlertAction* okAction = [UIAlertAction actionWithTitle:[token objectForKey:@"Token"] style:UIAlertActionStyleDefault
                                                              handler:^(UIAlertAction * action) {
                                                                  [self -> tokenField setText:[token objectForKey:@"Token"]];
-                                                                 if ([[token objectForKey:@"Production"] isEqualToString:@"True"]) {
-                                                                     
-                                                                 }
                                                                  [self initbtnClicked:nil];
                                                              }];
             [inforAlert addAction:okAction];
@@ -1158,6 +1107,7 @@
     }
     return res;
 }
+
 
 
 

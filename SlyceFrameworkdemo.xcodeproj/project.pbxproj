@@ -17,16 +17,12 @@
 		833574001E445E9000733966 /* SlyceFrameworkdemoUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 833573FF1E445E9000733966 /* SlyceFrameworkdemoUITests.m */; };
 		833CC1172094ACC0005B13FE /* CardFlight.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 833CC1162094ACC0005B13FE /* CardFlight.framework */; };
 		833CC1182094ACC0005B13FE /* CardFlight.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 833CC1162094ACC0005B13FE /* CardFlight.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		8352AD811FA1B9460054A84A /* WebViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8352AD7F1FA1B9460054A84A /* WebViewController.m */; };
-		8352AD821FA1B9460054A84A /* WebViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8352AD801FA1B9460054A84A /* WebViewController.xib */; };
-		8352AD841FA1BD6C0054A84A /* JSCallOC.html in Resources */ = {isa = PBXBuildFile; fileRef = 8352AD831FA1BD6C0054A84A /* JSCallOC.html */; };
-		8352AD851FA1BD840054A84A /* JSCallOC.html in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8352AD831FA1BD6C0054A84A /* JSCallOC.html */; };
+		834A26CF20A2BB04009EF6C2 /* SlycePay.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 834A26CE20A2BB04009EF6C2 /* SlycePay.framework */; };
+		834A26D020A2BB04009EF6C2 /* SlycePay.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 834A26CE20A2BB04009EF6C2 /* SlycePay.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		8361A7DD1EA8664D0014D0D1 /* ResultViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8361A7DB1EA8664D0014D0D1 /* ResultViewController.m */; };
 		8361A7DE1EA8664D0014D0D1 /* ResultViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8361A7DC1EA8664D0014D0D1 /* ResultViewController.xib */; };
 		83AD95421FBD62110095F3A4 /* public.pem in Resources */ = {isa = PBXBuildFile; fileRef = 83AD95411FBD62100095F3A4 /* public.pem */; };
-		83AEC1962057D61F0084CE80 /* Call1.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 83575D311F95976C002A1E31 /* Call1.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		83CA1C451F05BEE500912089 /* FileControl+Recorder.m in Sources */ = {isa = PBXBuildFile; fileRef = 83CA1C431F05BEE500912089 /* FileControl+Recorder.m */; };
-		83D826EF1FA3462800E04D94 /* com.cmsonline.iOSframework.js in Resources */ = {isa = PBXBuildFile; fileRef = 83D826EB1FA3462700E04D94 /* com.cmsonline.iOSframework.js */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -53,8 +49,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				83AEC1962057D61F0084CE80 /* Call1.framework in CopyFiles */,
-				8352AD851FA1BD840054A84A /* JSCallOC.html in CopyFiles */,
+				834A26D020A2BB04009EF6C2 /* SlycePay.framework in CopyFiles */,
 				833CC1182094ACC0005B13FE /* CardFlight.framework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -79,18 +74,13 @@
 		833573FF1E445E9000733966 /* SlyceFrameworkdemoUITests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SlyceFrameworkdemoUITests.m; sourceTree = "<group>"; };
 		833574011E445E9000733966 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		833CC1162094ACC0005B13FE /* CardFlight.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = CardFlight.framework; sourceTree = "<group>"; };
-		8352AD7E1FA1B9460054A84A /* WebViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WebViewController.h; sourceTree = "<group>"; };
-		8352AD7F1FA1B9460054A84A /* WebViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WebViewController.m; sourceTree = "<group>"; };
-		8352AD801FA1B9460054A84A /* WebViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = WebViewController.xib; sourceTree = "<group>"; };
-		8352AD831FA1BD6C0054A84A /* JSCallOC.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = JSCallOC.html; sourceTree = "<group>"; };
-		83575D311F95976C002A1E31 /* Call1.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Call1.framework; sourceTree = "<group>"; };
+		834A26CE20A2BB04009EF6C2 /* SlycePay.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = SlycePay.framework; sourceTree = "<group>"; };
 		8361A7DA1EA8664D0014D0D1 /* ResultViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ResultViewController.h; sourceTree = "<group>"; };
 		8361A7DB1EA8664D0014D0D1 /* ResultViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ResultViewController.m; sourceTree = "<group>"; };
 		8361A7DC1EA8664D0014D0D1 /* ResultViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ResultViewController.xib; sourceTree = "<group>"; };
 		83AD95411FBD62100095F3A4 /* public.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = public.pem; sourceTree = "<group>"; };
 		83CA1C431F05BEE500912089 /* FileControl+Recorder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "FileControl+Recorder.m"; sourceTree = "<group>"; };
 		83CA1C441F05BEE500912089 /* FileControl+Recorder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "FileControl+Recorder.h"; sourceTree = "<group>"; };
-		83D826EB1FA3462700E04D94 /* com.cmsonline.iOSframework.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = com.cmsonline.iOSframework.js; sourceTree = "<group>"; };
 		83F2D9841F8F9B1600DB39E4 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -99,6 +89,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				834A26CF20A2BB04009EF6C2 /* SlycePay.framework in Frameworks */,
 				833CC1172094ACC0005B13FE /* CardFlight.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -123,8 +114,8 @@
 		833573CE1E445E9000733966 = {
 			isa = PBXGroup;
 			children = (
+				834A26CE20A2BB04009EF6C2 /* SlycePay.framework */,
 				833CC1162094ACC0005B13FE /* CardFlight.framework */,
-				83575D311F95976C002A1E31 /* Call1.framework */,
 				833573D91E445E9000733966 /* SlyceFrameworkdemo */,
 				833573F31E445E9000733966 /* SlyceFrameworkdemoTests */,
 				833573FE1E445E9000733966 /* SlyceFrameworkdemoUITests */,
@@ -147,12 +138,7 @@
 			isa = PBXGroup;
 			children = (
 				83AD95411FBD62100095F3A4 /* public.pem */,
-				8352AD831FA1BD6C0054A84A /* JSCallOC.html */,
-				83D826EB1FA3462700E04D94 /* com.cmsonline.iOSframework.js */,
 				833573DD1E445E9000733966 /* AppDelegate.h */,
-				8352AD7E1FA1B9460054A84A /* WebViewController.h */,
-				8352AD7F1FA1B9460054A84A /* WebViewController.m */,
-				8352AD801FA1B9460054A84A /* WebViewController.xib */,
 				83CA1C431F05BEE500912089 /* FileControl+Recorder.m */,
 				83CA1C441F05BEE500912089 /* FileControl+Recorder.h */,
 				833573DE1E445E9000733966 /* AppDelegate.m */,
@@ -267,7 +253,7 @@
 		833573CF1E445E9000733966 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0900;
+				LastUpgradeCheck = 0930;
 				ORGANIZATIONNAME = chris;
 				TargetAttributes = {
 					833573D61E445E9000733966 = {
@@ -313,9 +299,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				83AD95421FBD62110095F3A4 /* public.pem in Resources */,
-				83D826EF1FA3462800E04D94 /* com.cmsonline.iOSframework.js in Resources */,
-				8352AD821FA1B9460054A84A /* WebViewController.xib in Resources */,
-				8352AD841FA1BD6C0054A84A /* JSCallOC.html in Resources */,
 				833573EA1E445E9000733966 /* LaunchScreen.storyboard in Resources */,
 				833573E71E445E9000733966 /* Assets.xcassets in Resources */,
 				833573E51E445E9000733966 /* Main.storyboard in Resources */,
@@ -345,7 +328,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				833573E21E445E9000733966 /* ViewController.m in Sources */,
-				8352AD811FA1B9460054A84A /* WebViewController.m in Sources */,
 				833573DF1E445E9000733966 /* AppDelegate.m in Sources */,
 				833573DC1E445E9000733966 /* main.m in Sources */,
 				8361A7DD1EA8664D0014D0D1 /* ResultViewController.m in Sources */,
@@ -417,6 +399,7 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -424,6 +407,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
@@ -472,6 +456,7 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -479,6 +464,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;

@@ -1,0 +1,6 @@
+framework module SlycePay {
+  umbrella header "SlycePay.h"
+
+  export *
+  module * { export * }
+}

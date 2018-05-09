@@ -95,22 +95,6 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="usy-Th-9dY">
-                                <rect key="frame" x="236" y="130" width="123" height="30"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <state key="normal" title="3 Connect Pinpad"/>
-                                <connections>
-                                    <action selector="connectPinpadClicked:" destination="BYZ-38-t0r" eventType="touchUpInside" id="DEV-dU-ise"/>
-                                </connections>
-                            </button>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Yo7-pH-rjm">
-                                <rect key="frame" x="122" y="130" width="108" height="30"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <state key="normal" title="2 Select Pinpad"/>
-                                <connections>
-                                    <action selector="selectPinPadClicked:" destination="BYZ-38-t0r" eventType="touchUpInside" id="gbJ-lK-8Di"/>
-                                </connections>
-                            </button>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="SQT-ef-uJj">
                                 <rect key="frame" x="177" y="234" width="55" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -143,7 +127,7 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="So0-Pa-tRk">
-                                <rect key="frame" x="33" y="156" width="62" height="30"/>
+                                <rect key="frame" x="282" y="130" width="62" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <state key="normal" title="ClearLog"/>
                                 <connections>
@@ -156,6 +140,14 @@
                                 <state key="normal" title="Void"/>
                                 <connections>
                                     <action selector="voidBtnClicked:" destination="BYZ-38-t0r" eventType="touchUpInside" id="VPy-VB-ate"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="usy-Th-9dY">
+                                <rect key="frame" x="133" y="130" width="123" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="3 Connect Pinpad"/>
+                                <connections>
+                                    <action selector="connectPinpadClicked:" destination="BYZ-38-t0r" eventType="touchUpInside" id="DEV-dU-ise"/>
                                 </connections>
                             </button>
                         </subviews>
@@ -172,7 +164,6 @@
                         <outlet property="messageLabel" destination="ZdW-af-xKt" id="Q9S-Z7-Fsm"/>
                         <outlet property="returnbtn" destination="UdI-dM-zzK" id="VUn-b0-8Up"/>
                         <outlet property="salebtn" destination="As1-4J-BtD" id="0K1-gd-NdY"/>
-                        <outlet property="selectPinPadBtn" destination="Yo7-pH-rjm" id="Umf-OQ-ATU"/>
                         <outlet property="tokenField" destination="PGx-ip-VHI" id="fm4-SS-wKK"/>
                         <outlet property="voidBtn" destination="NLF-ek-3Wa" id="ZJH-nb-2cv"/>
                     </connections>

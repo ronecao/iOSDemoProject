@@ -6,7 +6,7 @@
 //  Copyright © 2017 Chris. All rights reserved.
 //
 
-#import <Call1/FileControl.h>
+#import <SlycePay/SlycePay.h>
 
 @interface FileControl(Recorder)
 -(BOOL)createRecordFile:(NSString*)recordname;

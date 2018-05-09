@@ -1,6 +1,0 @@
-framework module Call1 {
-  umbrella header "Call1.h"
-
-  export *
-  module * { export * }
-}
