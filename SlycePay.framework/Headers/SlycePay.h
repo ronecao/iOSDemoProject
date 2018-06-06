@@ -225,14 +225,13 @@ typedef NS_ENUM(NSInteger, SLYCEPAYERRORList) {
 -(void)transactionReturnCompleted:( NSDictionary *)resultDict;
 -(void)transactionCaptureCompleted:( NSDictionary *)resultDict;
 -(void)transactionVoidCompleted:( NSDictionary *)resultDict;
--(void)verifySignature:(BOOL) notifyflg;
 -(void)voiceReferral:(BOOL) notifyflg withphone:(NSString *) phoneNumber;
 -(void)transactionMessageUpdate:(NSString *) msg;
 @optional
--(void)confirmCardinfo:(NSDictionary *)cardinfo; //cardflight
 -(void)devicedisattached; // usaepay creditcall cardflight
 -(void)deviceattached;//cardflight
 -(void)EMVApplicationList:(NSArray *)applications; //cardflight
+-(void)captureSignature;
 
 @end
 
@@ -248,13 +247,12 @@ typedef NS_ENUM(NSInteger, SLYCEPAYERRORList) {
 -(void)connectDevice:(NSString*) name configerror:(NSError **)error;
 //transactions API
 -(void)processSale:( NSDictionary *)transDict withError:(NSError**)error;
--(void)signatureVerified:(BOOL)result;
+-(void)signatureCaptured:(BOOL)result withImag:(UIImage *) img;
 -(void)phoneReferral:(BOOL)result withAuthcode:(NSString*) authcode;
 -(void)processReturn:( NSDictionary *)transDict withError:(NSError**)error;
 -(void)processAuthorization:( NSDictionary *)transDict withError:(NSError**)error;
 -(void)processCapture:( NSDictionary *)transDict withError:(NSError**)error;
 -(void)terminateTransaction;
--(void)cardinfoConfirmed:(BOOL)confirm;
 -(void)applicationSelected:(NSInteger)selection;
 -(void)processVoid:(NSDictionary *)transDict withError:(NSError **)error;
 //utility

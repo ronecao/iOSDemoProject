@@ -24,7 +24,6 @@
 -(void)selectpinpad:(NSString*) name;
 -(void)connectpinpad;
 -(void)tmsupdate;
--(void)signatureverified:(NSString*)result;
 
 
 @end

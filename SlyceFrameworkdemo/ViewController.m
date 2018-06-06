@@ -210,23 +210,21 @@
 
 /**
  library request signature verification
-
- @param notifyflg YES need notify library, NO no need notify library
  */
--(void)verifySignature:(BOOL) notifyflg
+-(void)captureSignature
 {
     UIAlertController* inforAlert = [UIAlertController alertControllerWithTitle:@"Processing Sale"
                                                                         message:@"Please Verify Signature" preferredStyle:UIAlertControllerStyleAlert];
     UIAlertAction* okAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault
                                                      handler:^(UIAlertAction * action) {
-                                                         [self->slycepay signatureVerified:YES];
+                                                         [self->slycepay signatureCaptured:YES withImag:nil];
 
                                                          
                                                      }];
     UIAlertAction* cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleDefault
                                                          handler:^(UIAlertAction * action) {
                                                              
-                                                             [self->slycepay signatureVerified:NO];
+                                                             [self->slycepay signatureCaptured:NO withImag:nil];
 
                                                              
                                                          }];
@@ -362,13 +360,7 @@
     //call1=[[CallOne alloc] initwith:@"cem_123" fromServer:nil Delegate:self];
     //[call1 setLogMode:YES];
 }
--(void)confirmCardinfo:(NSDictionary *)cardinfo
-{
-    NSLog( @"LOL crad %@",cardinfo.description);
-    //[call1 cardinfoConfirmed:YES];
-    NSString * card=[NSString stringWithFormat:@"%@*******%@", [cardinfo objectForKey:@"First6"], [cardinfo objectForKey:@"Last4"] ];
-    [self confirmcard: card];
-}
+
 
 - (void)transactionVoidCompleted:(NSDictionary *)resultDict {
     [slycepay APPLog:@"APP void %@",resultDict];
@@ -755,7 +747,6 @@
 {
     messageLabel.text = @"";
     [self updateInformationLabel:@"Start"];
-
     tokenField.text=@"3fyl02KZBOERy7yEd6SkWqbuYmGqHQ2T";//cardflight;
     if([tokenField.text isEqual:[NSNull null]]||tokenField.text.length==0){
         [self updateInformationLabel:@"Enter CMS Token Please"];
@@ -772,32 +763,6 @@
     //[call1 RSAtest];
     [slycepay ClearLog];
 }
-
-/**
- when libary need confirm card
- 
- @param cardinfo Cardinfo JsonString
- */
--(void)confirmcard: (NSString *) cardinfo
-{
-    UIAlertController* confirmAlert = [UIAlertController alertControllerWithTitle:@"Please confirm Card"
-                                                                          message:cardinfo
-                                                                   preferredStyle:UIAlertControllerStyleAlert];
-    UIAlertAction* yesAction = [UIAlertAction actionWithTitle:@"YES" style:UIAlertActionStyleDefault
-                                                      handler:^(UIAlertAction * action) {
-                                                          [self->slycepay cardinfoConfirmed:YES];
-                                                      }];
-    UIAlertAction* noAction = [UIAlertAction actionWithTitle:@"NO" style:UIAlertActionStyleDefault
-                                                     handler:^(UIAlertAction * action) {
-                                                         [self->slycepay cardinfoConfirmed:NO];
-                                                     }];
-    [confirmAlert addAction:yesAction];
-    [confirmAlert addAction:noAction];
-    [self presentViewController:confirmAlert animated:YES completion:nil];
-}
-
-
-
 
 #pragma mark Utilis
 
